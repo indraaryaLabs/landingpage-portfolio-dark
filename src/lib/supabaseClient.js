@@ -14,10 +14,17 @@ export const supabase = (supabaseUrl && supabaseAnonKey)
   : new Proxy({}, {
       get: (target, prop) => {
         if (prop === 'auth') {
-          return {
+          return new Proxy({
             onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } }),
             getSession: () => Promise.resolve({ data: { session: null } }),
-          };
+          }, {
+            get: (authTarget, authProp) => {
+              if (authProp in authTarget) return authTarget[authProp];
+              return () => {
+                throw new Error('Supabase authentication is disabled because VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY environment variables are missing on Vercel.');
+              };
+            }
+          });
         }
         return () => {
           throw new Error('Supabase client is not initialized because environment variables are missing.');
