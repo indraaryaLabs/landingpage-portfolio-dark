@@ -41,7 +41,23 @@ const ICON_MAP = {
 };
 
 function StepCard({ item, index }) {
-  const IconComponent = ICON_MAP[item.icon] || Phone;
+  // Determine which icon component to use dynamically based on step_number/index
+  let IconComponent = ICON_MAP[item.icon];
+  if (!IconComponent) {
+    const stepNumVal = item.step_number || item.stepNumber;
+    const stepNum = stepNumVal ? parseInt(String(stepNumVal).trim(), 10) : (index + 1);
+    if (stepNum === 1) {
+      IconComponent = Phone;
+    } else if (stepNum === 2) {
+      IconComponent = Palette;
+    } else if (stepNum === 3) {
+      IconComponent = Code2;
+    } else if (stepNum === 4) {
+      IconComponent = Package;
+    } else {
+      IconComponent = Phone;
+    }
+  }
   return (
     <div
       className="relative bg-[#0a0a0a] rounded-[1.5rem] p-7 flex flex-col w-[340px] min-w-[340px] h-[300px] group flex-shrink-0"
