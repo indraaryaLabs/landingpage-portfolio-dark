@@ -17,10 +17,10 @@ export const experience = [
   },
   {
     role: 'Digital Content & Project Coordination Intern',
-    company: 'Wesclic',
+    company: 'PT Wesclic Indonesia Neotech',
     period: 'Aug – Nov 2025',
     location: 'Yogyakarta',
-    description: 'Supported digital content production and project coordination, including organizing deliverables and collaborating with the team.',
+    description: 'Coordinated incoming project requests, identified missing scope or assets, tracked revisions, and supported social-media concepts and company-event documentation.',
   },
 ];
 

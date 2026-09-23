@@ -1,17 +1,43 @@
 import { useEffect, useState } from 'react';
-import { ArrowDown, ArrowUpRight, Mail } from 'lucide-react';
 import { experience, profile, projects, skillGroups } from '../data/portfolio';
+import '@fontsource-variable/inter-tight/wght.css';
 import './portfolio.css';
 
-function ExternalLink({ href, children, className = '', ...props }) {
-  return <a className={className} href={href} target="_blank" rel="noopener noreferrer" {...props}>{children}</a>;
+function EmailButton({ className = '' }) {
+  const [copied, setCopied] = useState(false);
+
+  async function copyEmail() {
+    try {
+      await navigator.clipboard.writeText(profile.email);
+      setCopied(true);
+    } catch {
+      window.location.href = `mailto:${profile.email}`;
+    }
+  }
+
+  return <button type="button" className={`lofi-email ${className}`} onClick={copyEmail} aria-label={copied ? 'Email address copied' : `Copy email address ${profile.email}`}>
+    <span>{copied ? 'EMAIL COPIED' : profile.email}</span>
+    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none"><rect x="8" y="8" width="11" height="12" rx="1.5" stroke="currentColor" strokeWidth="1.7" /><path d="M16 8V5.5A1.5 1.5 0 0 0 14.5 4h-9A1.5 1.5 0 0 0 4 5.5v10A1.5 1.5 0 0 0 5.5 17H8" stroke="currentColor" strokeWidth="1.7" /></svg>
+  </button>;
 }
 
-function SectionHeading({ number, title, note }) {
-  return <div className="pf-section-heading">
-    <div className="pf-section-index">{number} / {note}</div>
-    <h2>{title}</h2>
+function ProjectArt({ project, image }) {
+  if (image) return <img className="lofi-project-image" src={image} alt={`${project.name} project screenshot`} loading="lazy" decoding="async" width="1200" height="675" />;
+
+  return <div className={`lofi-project-art lofi-project-art-${project.slot}`} aria-hidden="true">
+    <span className="lofi-art-kicker">INDRA ARYA / PROJECT 0{project.slot}</span>
+    <div className="lofi-art-center"><strong>{project.slot === 1 ? 'JEJAK\nKARIER' : project.slot === 2 ? 'RELIABILITY\nCOMMAND CENTER' : 'E-COMMERCE\nETL PIPELINE'}</strong><span className="lofi-art-mark">{project.slot === 1 ? '↗' : project.slot === 2 ? '◌' : '→'}</span></div>
+    <span className="lofi-art-bottom">{project.stack.slice(0, 3).join(' / ')}</span>
   </div>;
+}
+
+function ProjectCard({ project, image }) {
+  return <article className="lofi-project-card">
+    <a className="lofi-project-link" href={project.link} target="_blank" rel="noopener noreferrer">
+      <div className="lofi-project-media"><ProjectArt project={project} image={image} /></div>
+      <div className="lofi-project-caption"><div><span className="lofi-meta">0{project.slot} / {project.category}</span><h3>{project.name}</h3><p>{project.summary}</p></div><span className="lofi-project-arrow" aria-hidden="true">↗</span></div>
+    </a>
+  </article>;
 }
 
 export default function Home() {
@@ -19,7 +45,7 @@ export default function Home() {
 
   useEffect(() => {
     if (!import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_ANON_KEY) return;
-    const section = document.getElementById('projects');
+    const section = document.getElementById('teaser');
     if (!section) return;
     let cancelled = false;
     const observer = new IntersectionObserver((entries) => {
@@ -33,76 +59,32 @@ export default function Home() {
           if (row?.image_url) images[project.slot] = row.image_url;
         }
         setProjectImages(images);
-      }).catch(() => { /* CSS project artwork remains available when CMS is offline. */ });
+      }).catch(() => { /* Original project artwork remains when CMS is unavailable. */ });
     }, { rootMargin: '400px' });
     observer.observe(section);
     return () => { cancelled = true; observer.disconnect(); };
   }, []);
 
-  return <div className="portfolio">
-    <div className="pf-grain" aria-hidden="true" />
-    <header className="pf-header">
-      <a className="pf-mark" href="#top" aria-label="Back to top">IA<span>.</span></a>
-      <nav aria-label="Main navigation">
-        <a href="#work">Work</a><a href="#projects">Projects</a><a href="#about">About</a>
-      </nav>
-      <a className="pf-header-contact" href={`mailto:${profile.email}`}>Get in touch <ArrowUpRight size={16} /></a>
-    </header>
+  return <div className="lofi-site" id="top">
+    <header className="lofi-header"><a className="lofi-wordmark" href="#top">INDRA ARYA</a><nav aria-label="Main navigation"><a href="#work">WORK</a><a href="#about">ABOUT</a></nav><EmailButton className="lofi-header-email" /></header>
+    <main>
+      <section className="lofi-hero" aria-labelledby="lofi-title">
+        <div className="lofi-hero-portrait"><img src="/indra-portrait-480.jpg" alt="Portrait of Indra Arya" width="480" height="480" fetchPriority="high" /></div>
+        <div className="lofi-hero-copy"><h1 id="lofi-title">Software<br />Engineer</h1><p className="lofi-hero-lead">I build useful software across web, mobile, and data workflows.</p><p className="lofi-hero-secondary">At PickFrame, I worked across Go APIs and React. I’m now available for junior roles across Indonesia.</p><div className="lofi-hero-actions"><EmailButton /><a className="lofi-text-link" href="https://pickframe.satuarah.click" target="_blank" rel="noopener noreferrer">VIEW LIVE PRODUCT <span aria-hidden="true">↗</span></a></div></div>
+      </section>
+      <div className="lofi-teaser" id="teaser" aria-hidden="true">{projects.map(project => <div className="lofi-teaser-panel" key={project.slot}><ProjectArt project={project} image={projectImages[project.slot]} /></div>)}</div>
 
-    <main id="top">
-      <section className="pf-hero" aria-labelledby="pf-title">
-        <div className="pf-hero-topline"><span className="pf-availability"><span className="pf-dot" /> Available immediately</span><span>{profile.location} · Open to relocation</span></div>
-        <div className="pf-hero-main">
-          <div>
-            <p className="pf-eyebrow">INDRA ARYA / SOFTWARE ENGINEER</p>
-            <h1 id="pf-title">Software for<br /><em>real workflows.</em></h1>
-            <p className="pf-hero-copy">I'm Indra, a junior software engineer. My freelance work on PickFrame spans Go APIs, PostgreSQL/Supabase and React. The projects below show how I approach mobile apps, service visibility and data processing.</p>
-            <div className="pf-actions">
-              <ExternalLink className="pf-button pf-button-primary" href="https://pickframe.satuarah.click">Explore live product <ArrowUpRight size={17} /></ExternalLink>
-              <a className="pf-button pf-button-ghost" href="#projects">View selected projects <ArrowDown size={17} /></a>
-            </div>
-          </div>
-          <div className="pf-hero-aside" aria-label="Professional focus">
-            <div className="pf-orbit" aria-hidden="true"><span>IA</span></div>
-            <p>ENGINEERING WITH CONTEXT<br />PRODUCT · SYSTEMS · DATA</p>
-          </div>
-        </div>
-        <div className="pf-hero-bottom"><span>SELECTED WORK / 2025—2026</span><a href="#work">SCROLL TO EXPLORE <ArrowDown size={14} /></a></div>
+      <section className="lofi-work" id="work" aria-labelledby="work-title"><div className="lofi-work-heading"><h2 id="work-title">Featured work</h2><p>(SCROLL TO EXPLORE)</p></div>
+        <a className="lofi-feature" href="https://pickframe.satuarah.click" target="_blank" rel="noopener noreferrer" aria-label="View the PickFrame live product">
+          <span className="lofi-feature-top">SELECTED LIVE PRODUCT <span>2026 / FREELANCE</span></span>
+          <span className="lofi-feature-center"><strong>PickFrame</strong><span aria-hidden="true">↗</span></span>
+          <span className="lofi-feature-bottom">A photography business platform covering galleries, orders, invoices, subscriptions and an operator dashboard. Built across Go, PostgreSQL and React.</span>
+        </a>
+        <div className="lofi-project-grid">{projects.map(project => <ProjectCard key={project.slot} project={project} image={projectImages[project.slot]} />)}</div>
       </section>
 
-      <section className="pf-section pf-work" id="work">
-        <SectionHeading number="01" note="EXPERIENCE" title={<>Real work.<br /><em>Clear scope.</em></>} />
-        <div className="pf-work-list">{experience.map((item) => <article className="pf-work-item" key={item.company}>
-          <div className="pf-work-meta"><span>{item.period}</span><span>{item.location}</span></div>
-          <div><p className="pf-work-role">{item.role}</p><h3>{item.company}</h3><p className="pf-work-desc">{item.description}</p>
-          {item.link && <ExternalLink href={item.link} className="pf-text-link">View product <ArrowUpRight size={15} /></ExternalLink>}</div>
-        </article>)}</div>
-      </section>
-
-      <section className="pf-section pf-projects" id="projects">
-        <SectionHeading number="02" note="SELECTED PROJECTS" title={<>Evidence over<br /><em>adjectives.</em></>} />
-        <p className="pf-section-intro">Three public repositories that show how I approach mobile product flows, system visibility and data processing.</p>
-        <div className="pf-project-grid">{projects.map((item) => <article className="pf-project" key={item.name}>
-          <div className={`pf-project-art pf-art-${item.art}`} aria-hidden={!projectImages[item.slot]}>
-            {projectImages[item.slot] ? <img className="pf-project-image" src={projectImages[item.slot]} alt={`${item.name} project screenshot`} width="800" height="450" loading="lazy" decoding="async" /> : null}
-            {!projectImages[item.slot] && item.art === 'mobile' && <div className="pf-phone"><div className="pf-phone-bar" /><div className="pf-phone-title">Jejak Karier</div><div className="pf-phone-stat"><b>Applications</b><span>Track your next step</span></div><div className="pf-phone-row" /><div className="pf-phone-row short" /><div className="pf-phone-row" /></div>}
-            {!projectImages[item.slot] && item.art === 'systems' && <div className="pf-system"><div className="pf-system-top">SERVICE STATUS <span>● LIVE</span></div><div className="pf-system-chart"><i /><i /><i /><i /><i /><i /><i /><i /><i /><i /></div><div className="pf-system-line"/><div className="pf-system-line short"/></div>}
-            {!projectImages[item.slot] && item.art === 'data' && <div className="pf-data-visual"><span>EXTRACT</span><b>→</b><span>TRANSFORM</span><b>→</b><span>EXPORT</span><div className="pf-data-grid" /></div>}
-          </div>
-          <div className="pf-project-head"><span>{item.number} / {item.category}</span><ExternalLink href={item.link} className="pf-project-arrow" aria-label={`Open ${item.name} repository`}><ArrowUpRight size={20} /></ExternalLink></div>
-          <h3>{item.name}</h3><p>{item.summary}</p><div className="pf-tags">{item.stack.map(tag => <span key={tag}>{tag}</span>)}</div>
-          <ExternalLink href={item.link} className="pf-text-link">View repository <ArrowUpRight size={15} /></ExternalLink>
-        </article>)}</div>
-      </section>
-
-      <section className="pf-section pf-about" id="about">
-        <SectionHeading number="03" note="ABOUT & SKILLS" title={<>Curious by default.<br /><em>Grounded in delivery.</em></>} />
-        <div className="pf-about-grid"><div><p className="pf-about-lead">I am an Informatics graduate from UIN Sunan Kalijaga Yogyakarta (2025, GPA 3.54/4.00).</p><p>My strongest evidence is a freelance full-stack product and hands-on projects across mobile, backend, system monitoring and data pipelines. I am currently seeking an entry-level software engineering role and am open to relocation across Indonesia.</p><div className="pf-education"><span>EDUCATION</span><strong>Bachelor of Informatics (S.Kom)</strong><span>UIN Sunan Kalijaga Yogyakarta · 2021–2025</span></div></div>
-          <div className="pf-skills">{skillGroups.map(group => <div className="pf-skill-row" key={group.title}><h3>{group.title}</h3><p>{group.items}</p></div>)}</div></div>
-      </section>
-
-      <section className="pf-contact" id="contact"><div className="pf-contact-top"><span>04 / LET'S CONNECT</span><span>KENDARI · INDONESIA</span></div><h2>Have a role<br /><em>in mind?</em></h2><p>Open to junior software engineering and related IT opportunities.</p><a className="pf-contact-link" href={`mailto:${profile.email}`}>{profile.email}<ArrowUpRight size={30} /></a></section>
+      <section className="lofi-about" id="about" aria-labelledby="about-title"><h2 id="about-title">About</h2><div className="lofi-about-intro"><h3>Practical engineering, grounded in real product work.</h3><div><p>I’m Indra, an Informatics graduate from UIN Sunan Kalijaga Yogyakarta (2025, GPA 3.54/4.00). My freelance work on PickFrame covered a live product’s APIs, database and frontend; my public repositories show mobile, monitoring and data-pipeline projects.</p><p>I’m based in Kendari, available immediately, and open to on-site, hybrid or remote roles across Indonesia.</p></div></div><div className="lofi-timeline">{experience.map(item => <article className="lofi-timeline-row" key={item.company}><p className="lofi-timeline-date">{item.period}</p><div><h3>{item.company}</h3><p className="lofi-timeline-role">{item.role} · {item.location}</p><p className="lofi-timeline-description">{item.description}</p>{item.link && <a href={item.link} target="_blank" rel="noopener noreferrer" className="lofi-timeline-link">VIEW PRODUCT ↗</a>}</div></article>)}<div className="lofi-timeline-row"><p className="lofi-timeline-date">2021–2025</p><div><h3>UIN Sunan Kalijaga Yogyakarta</h3><p className="lofi-timeline-role">Bachelor of Informatics (S.Kom) · GPA 3.54/4.00</p></div></div></div><div className="lofi-skills"><h3>Tools I use</h3><div>{skillGroups.map(group => <p key={group.title}><span>{group.title}</span>{group.items}</p>)}</div></div></section>
     </main>
-    <footer className="pf-footer"><span>© {new Date().getFullYear()} {profile.name}</span><div><ExternalLink href={profile.github}>GitHub <ArrowUpRight size={15} /></ExternalLink><ExternalLink href={profile.linkedin}>LinkedIn <ArrowUpRight size={15} /></ExternalLink><a href={`mailto:${profile.email}`}>Email <Mail size={15} /></a></div><a href="#top">Back to top ↑</a></footer>
+    <footer className="lofi-footer" id="contact"><p className="lofi-footer-overline">LET’S GET TO KNOW EACH OTHER</p><h2>Have a role<br />in mind?</h2><EmailButton /><div className="lofi-footer-bottom"><span>© {new Date().getFullYear()} {profile.name}</span><div><a href={profile.github} target="_blank" rel="noopener noreferrer">GITHUB ↗</a><a href={profile.linkedin} target="_blank" rel="noopener noreferrer">LINKEDIN ↗</a><a href="#top">BACK TO TOP ↑</a></div></div></footer>
   </div>;
 }
