@@ -1,9 +1,9 @@
-import React, { useState, useRef } from 'react';
+import { useState, useRef } from 'react';
 import { Upload, Trash2, Image as ImageIcon } from 'lucide-react';
 import { uploadMedia } from '../../../lib/supabaseApi';
 import { ImageCropperModal } from './ImageCollectionUpload';
 
-export default function ImageUpload({ value, onChange, label, aspect = 'free' }) {
+export default function ImageUpload({ value, onChange, label, aspect = 'free', imagesOnly = false, optimized = false, onUploadingChange = () => {} }) {
   const [uploading, setUploading] = useState(false);
   const [dragover, setDragover] = useState(false);
   const inputRef = useRef(null);
@@ -16,6 +16,7 @@ export default function ImageUpload({ value, onChange, label, aspect = 'free' })
   // Direct upload for non-images (videos) or bypass
   async function uploadDirectly(file) {
     setUploading(true);
+    onUploadingChange(true);
     try {
       const publicUrl = await uploadMedia(file);
       onChange(publicUrl);
@@ -24,11 +25,20 @@ export default function ImageUpload({ value, onChange, label, aspect = 'free' })
       alert('Upload failed: ' + err.message);
     } finally {
       setUploading(false);
+      onUploadingChange(false);
     }
   }
 
   function handleFileSelect(file) {
     if (!file) return;
+    if (imagesOnly && !file.type.startsWith('image/')) {
+      alert('Please select an image file.');
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      alert('Please select a file smaller than 10 MB.');
+      return;
+    }
 
     if (file.type.startsWith('image/')) {
       // If it is an image, open the visual cropper modal
@@ -48,8 +58,11 @@ export default function ImageUpload({ value, onChange, label, aspect = 'free' })
   async function handleCropCompleted(croppedBlob, originalName) {
     setShowCropModal(false);
     setUploading(true);
+    onUploadingChange(true);
     try {
-      const fileToUpload = new File([croppedBlob], originalName, { type: 'image/jpeg' });
+      const type = croppedBlob.type || 'image/jpeg';
+      const extension = type === 'image/webp' ? 'webp' : type === 'image/png' ? 'png' : 'jpg';
+      const fileToUpload = new File([croppedBlob], `${originalName.replace(/\.[^.]+$/, '')}.${extension}`, { type });
       const publicUrl = await uploadMedia(fileToUpload);
       onChange(publicUrl);
     } catch (err) {
@@ -57,6 +70,7 @@ export default function ImageUpload({ value, onChange, label, aspect = 'free' })
       alert('Upload failed: ' + err.message);
     } finally {
       setUploading(false);
+      onUploadingChange(false);
       setCropFile(null);
       setCropImageSrc('');
     }
@@ -136,7 +150,7 @@ export default function ImageUpload({ value, onChange, label, aspect = 'free' })
       <input
         ref={inputRef}
         type="file"
-        accept="image/*,video/*"
+        accept={imagesOnly ? 'image/*' : 'image/*,video/*'}
         onChange={onFileSelect}
         style={{ display: 'none' }}
       />
@@ -148,6 +162,8 @@ export default function ImageUpload({ value, onChange, label, aspect = 'free' })
           filename={cropFile?.name || 'cropped_image.jpg'}
           filetype={cropFile?.type || 'image/jpeg'}
           defaultAspect={aspect}
+          outputType={optimized ? 'image/webp' : cropFile?.type || 'image/jpeg'}
+          maxWidth={optimized ? 1440 : undefined}
           onCancel={() => {
             setShowCropModal(false);
             setCropFile(null);

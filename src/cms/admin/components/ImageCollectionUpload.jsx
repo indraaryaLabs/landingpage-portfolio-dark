@@ -294,7 +294,7 @@ function parseRatio(ratioStr) {
 }
 
 // Visual Image Cropper Modal with Aspect Ratio presets and Rule-of-Thirds Grid lines
-export function ImageCropperModal({ src, filename, filetype, defaultAspect = '22/15', onCancel, onSave }) {
+export function ImageCropperModal({ src, filename, filetype, defaultAspect = '22/15', outputType = filetype, maxWidth, onCancel, onSave }) {
   const [aspectRatio, setAspectRatio] = useState(defaultAspect); // default aspect ratio
   const [renderedSize, setRenderedSize] = useState({ width: 0, height: 0 });
   const [interactionActive, setInteractionActive] = useState(null); // 'move' or 'resize'
@@ -525,8 +525,9 @@ export function ImageCropperModal({ src, filename, filetype, defaultAspect = '22
     const cropH = crop.height * scaleY;
     
     const canvas = document.createElement('canvas');
-    canvas.width = cropW;
-    canvas.height = cropH;
+    const outputScale = maxWidth ? Math.min(1, maxWidth / cropW) : 1;
+    canvas.width = Math.max(1, Math.round(cropW * outputScale));
+    canvas.height = Math.max(1, Math.round(cropH * outputScale));
     const ctx = canvas.getContext('2d');
     
     if (!ctx) {
@@ -543,7 +544,7 @@ export function ImageCropperModal({ src, filename, filetype, defaultAspect = '22
     img.crossOrigin = 'anonymous'; // Prevent CORS tainted canvas
     img.src = src;
     img.onload = () => {
-      ctx.drawImage(img, cropX, cropY, cropW, cropH, 0, 0, cropW, cropH);
+      ctx.drawImage(img, cropX, cropY, cropW, cropH, 0, 0, canvas.width, canvas.height);
       
       canvas.toBlob(
         (blob) => {
@@ -554,8 +555,8 @@ export function ImageCropperModal({ src, filename, filetype, defaultAspect = '22
             alert('Failed to crop image. Please try again.');
           }
         },
-        filetype,
-        0.95 // High quality JPEG/PNG output
+        outputType,
+        outputType === 'image/webp' ? 0.82 : 0.92
       );
     };
     img.onerror = (e) => {
