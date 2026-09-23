@@ -1,18 +1,16 @@
 import { useEffect, useState } from 'react';
-import { ArrowDown, ArrowUpRight, Mail } from 'lucide-react';
-import { experience, profile, projects, skillGroups } from '../data/portfolio';
-import './portfolio.css';
+import { ArrowUpRight, CircleDot } from 'lucide-react';
+import Navigation from '../components/Navigation';
+import Hero from '../components/Hero';
+import RecentProjects from '../components/RecentProjects';
+import AboutExperience from '../components/AboutExperience';
+import { profile, projects, skillGroups } from '../data/portfolio';
+import '../index.css';
 
-function ExternalLink({ href, children, className = '', ...props }) {
-  return <a className={className} href={href} target="_blank" rel="noopener noreferrer" {...props}>{children}</a>;
-}
-
-function SectionHeading({ number, title, note }) {
-  return <div className="pf-section-heading">
-    <div className="pf-section-index">{number} / {note}</div>
-    <h2>{title}</h2>
-  </div>;
-}
+const proof = [
+  { title: 'Product development', body: 'PickFrame: Go/Gin APIs, PostgreSQL/Supabase and a React interface for photography business workflows.', href: 'https://pickframe.satuarah.click', label: 'View live product' },
+  { title: 'Public engineering work', body: 'Repositories cover a mobile job tracker, a service-operations dashboard and a tested data pipeline.', href: profile.github, label: 'Explore GitHub' },
+];
 
 export default function Home() {
   const [projectImages, setProjectImages] = useState({});
@@ -33,76 +31,52 @@ export default function Home() {
           if (row?.image_url) images[project.slot] = row.image_url;
         }
         setProjectImages(images);
-      }).catch(() => { /* CSS project artwork remains available when CMS is offline. */ });
+      }).catch(() => { /* Keep fallback artwork if CMS is unavailable. */ });
     }, { rootMargin: '400px' });
     observer.observe(section);
     return () => { cancelled = true; observer.disconnect(); };
   }, []);
 
-  return <div className="portfolio">
-    <div className="pf-grain" aria-hidden="true" />
-    <header className="pf-header">
-      <a className="pf-mark" href="#top" aria-label="Back to top">IA<span>.</span></a>
-      <nav aria-label="Main navigation">
-        <a href="#work">Work</a><a href="#projects">Projects</a><a href="#about">About</a>
-      </nav>
-      <a className="pf-header-contact" href={`mailto:${profile.email}`}>Get in touch <ArrowUpRight size={16} /></a>
-    </header>
-
-    <main id="top">
-      <section className="pf-hero" aria-labelledby="pf-title">
-        <div className="pf-hero-topline"><span className="pf-availability"><span className="pf-dot" /> Available immediately</span><span>{profile.location} · Open to relocation</span></div>
-        <div className="pf-hero-main">
-          <div>
-            <p className="pf-eyebrow">INDRA ARYA / SOFTWARE ENGINEER</p>
-            <h1 id="pf-title">Software for<br /><em>real workflows.</em></h1>
-            <p className="pf-hero-copy">I'm Indra, a junior software engineer. My freelance work on PickFrame spans Go APIs, PostgreSQL/Supabase and React. The projects below show how I approach mobile apps, service visibility and data processing.</p>
-            <div className="pf-actions">
-              <ExternalLink className="pf-button pf-button-primary" href="https://pickframe.satuarah.click">Explore live product <ArrowUpRight size={17} /></ExternalLink>
-              <a className="pf-button pf-button-ghost" href="#projects">View selected projects <ArrowDown size={17} /></a>
+  return <>
+    <Navigation />
+    <main id="top" className="relative z-10 pt-28 md:pt-32 max-w-[100vw] mx-auto flex flex-col">
+      <div className="relative z-0 px-4 md:px-8 max-w-7xl mx-auto w-full pb-20"><Hero /></div>
+      <div className="section-card relative z-10 bg-[#0a0a0a] rounded-t-[2.5rem] -mt-6 border-t border-white/[0.06]" id="projects">
+        <div className="px-4 md:px-8 max-w-7xl mx-auto py-16 md:py-24"><RecentProjects projects={projects} projectImages={projectImages} /></div>
+      </div>
+      <div className="section-card relative z-20 bg-[#0c0c0c] rounded-t-[2.5rem] -mt-6 border-t border-white/[0.06]" id="about">
+        <div className="px-4 md:px-8 max-w-7xl mx-auto py-16 md:py-24"><AboutExperience /></div>
+      </div>
+      <div className="section-card relative z-30 bg-[#0a0a0a] rounded-t-[2.5rem] -mt-6 border-t border-white/[0.06]" id="capabilities">
+        <section className="px-4 md:px-8 max-w-7xl mx-auto py-16 md:py-24" aria-labelledby="capabilities-title">
+          <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full text-[13px] font-medium text-white mb-6 tracking-wide bg-white/[0.04]"><CircleDot className="w-4 h-4" /> Technical focus</div>
+          <h2 id="capabilities-title" className="text-4xl md:text-6xl font-bold tracking-tighter mb-4">What I <span className="italic font-serif font-normal text-zinc-500">build with</span></h2>
+          <p className="text-zinc-400 text-sm md:text-base max-w-2xl mb-10 leading-relaxed">Technologies used in my freelance work and public projects—not a claim of expertise in every stack.</p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {skillGroups.map((group, index) => <div key={group.title} className="rounded-[1.5rem] bg-[#0d0d0d] p-7 md:p-8 min-h-60 flex flex-col" style={{ boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.06), 8px 12px 30px rgba(0,0,0,0.5)' }}>
+              <span className="text-xs text-zinc-400 mb-12">0{index + 1} / CAPABILITY</span><h3 className="text-xl font-semibold mb-3">{group.title}</h3><p className="text-sm text-zinc-400 leading-relaxed">{group.items}</p>
+            </div>)}
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+            {proof.map(item => <a key={item.title} href={item.href} target="_blank" rel="noopener noreferrer" className="rounded-[1.5rem] bg-[#0d0d0d] p-7 md:p-8 group hover:bg-[#151515] transition-colors border border-white/[0.04]">
+              <div className="flex items-start justify-between gap-4"><h3 className="text-lg font-semibold">{item.title}</h3><ArrowUpRight className="w-5 h-5 text-zinc-400 group-hover:text-white" /></div><p className="text-sm text-zinc-400 leading-relaxed mt-4 mb-6">{item.body}</p><span className="text-xs text-zinc-400">{item.label}</span>
+            </a>)}
+          </div>
+        </section>
+      </div>
+      <div className="section-card relative z-40 bg-[#0c0c0c] rounded-t-[2.5rem] -mt-6 border-t border-white/[0.06]" id="contact">
+        <footer className="px-4 md:px-8 max-w-7xl mx-auto py-16 md:py-24">
+          <div className="rounded-[2rem] bg-[#0a0a0a] border border-white/[0.06] p-8 md:p-14 flex flex-col lg:flex-row justify-between gap-12">
+            <div><div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full text-[13px] font-medium bg-white/[0.04] mb-6"><CircleDot className="w-4 h-4" /> Let’s connect</div><h2 className="text-4xl md:text-6xl font-bold tracking-tighter mb-5">Let's build <span className="italic font-serif font-normal text-zinc-500">something useful.</span></h2><p className="text-zinc-400 max-w-xl leading-relaxed">Open to junior software engineering and related IT opportunities. Based in Kendari, available immediately and open to relocation.</p></div>
+            <div className="flex flex-col justify-center gap-3 lg:min-w-72">
+              <a className="rounded-full bg-white text-black px-6 py-3 font-semibold text-sm flex items-center justify-between hover:bg-zinc-200" href={`mailto:${profile.email}`}>Email me <ArrowUpRight size={17} /></a>
+              <a className="rounded-full border border-white/15 px-6 py-3 font-medium text-sm flex items-center justify-between hover:bg-white/[0.04]" href={profile.linkedin} target="_blank" rel="noopener noreferrer">LinkedIn <ArrowUpRight size={17} /></a>
+              <a className="rounded-full border border-white/15 px-6 py-3 font-medium text-sm flex items-center justify-between hover:bg-white/[0.04]" href={profile.github} target="_blank" rel="noopener noreferrer">GitHub <ArrowUpRight size={17} /></a>
             </div>
           </div>
-          <div className="pf-hero-aside" aria-label="Professional focus">
-            <div className="pf-orbit" aria-hidden="true"><span>IA</span></div>
-            <p>ENGINEERING WITH CONTEXT<br />PRODUCT · SYSTEMS · DATA</p>
-          </div>
-        </div>
-        <div className="pf-hero-bottom"><span>SELECTED WORK / 2025—2026</span><a href="#work">SCROLL TO EXPLORE <ArrowDown size={14} /></a></div>
-      </section>
-
-      <section className="pf-section pf-work" id="work">
-        <SectionHeading number="01" note="EXPERIENCE" title={<>Real work.<br /><em>Clear scope.</em></>} />
-        <div className="pf-work-list">{experience.map((item) => <article className="pf-work-item" key={item.company}>
-          <div className="pf-work-meta"><span>{item.period}</span><span>{item.location}</span></div>
-          <div><p className="pf-work-role">{item.role}</p><h3>{item.company}</h3><p className="pf-work-desc">{item.description}</p>
-          {item.link && <ExternalLink href={item.link} className="pf-text-link">View product <ArrowUpRight size={15} /></ExternalLink>}</div>
-        </article>)}</div>
-      </section>
-
-      <section className="pf-section pf-projects" id="projects">
-        <SectionHeading number="02" note="SELECTED PROJECTS" title={<>Evidence over<br /><em>adjectives.</em></>} />
-        <p className="pf-section-intro">Three public repositories that show how I approach mobile product flows, system visibility and data processing.</p>
-        <div className="pf-project-grid">{projects.map((item) => <article className="pf-project" key={item.name}>
-          <div className={`pf-project-art pf-art-${item.art}`} aria-hidden={!projectImages[item.slot]}>
-            {projectImages[item.slot] ? <img className="pf-project-image" src={projectImages[item.slot]} alt={`${item.name} project screenshot`} width="800" height="450" loading="lazy" decoding="async" /> : null}
-            {!projectImages[item.slot] && item.art === 'mobile' && <div className="pf-phone"><div className="pf-phone-bar" /><div className="pf-phone-title">Jejak Karier</div><div className="pf-phone-stat"><b>Applications</b><span>Track your next step</span></div><div className="pf-phone-row" /><div className="pf-phone-row short" /><div className="pf-phone-row" /></div>}
-            {!projectImages[item.slot] && item.art === 'systems' && <div className="pf-system"><div className="pf-system-top">SERVICE STATUS <span>● LIVE</span></div><div className="pf-system-chart"><i /><i /><i /><i /><i /><i /><i /><i /><i /><i /></div><div className="pf-system-line"/><div className="pf-system-line short"/></div>}
-            {!projectImages[item.slot] && item.art === 'data' && <div className="pf-data-visual"><span>EXTRACT</span><b>→</b><span>TRANSFORM</span><b>→</b><span>EXPORT</span><div className="pf-data-grid" /></div>}
-          </div>
-          <div className="pf-project-head"><span>{item.number} / {item.category}</span><ExternalLink href={item.link} className="pf-project-arrow" aria-label={`Open ${item.name} repository`}><ArrowUpRight size={20} /></ExternalLink></div>
-          <h3>{item.name}</h3><p>{item.summary}</p><div className="pf-tags">{item.stack.map(tag => <span key={tag}>{tag}</span>)}</div>
-          <ExternalLink href={item.link} className="pf-text-link">View repository <ArrowUpRight size={15} /></ExternalLink>
-        </article>)}</div>
-      </section>
-
-      <section className="pf-section pf-about" id="about">
-        <SectionHeading number="03" note="ABOUT & SKILLS" title={<>Curious by default.<br /><em>Grounded in delivery.</em></>} />
-        <div className="pf-about-grid"><div><p className="pf-about-lead">I am an Informatics graduate from UIN Sunan Kalijaga Yogyakarta (2025, GPA 3.54/4.00).</p><p>My strongest evidence is a freelance full-stack product and hands-on projects across mobile, backend, system monitoring and data pipelines. I am currently seeking an entry-level software engineering role and am open to relocation across Indonesia.</p><div className="pf-education"><span>EDUCATION</span><strong>Bachelor of Informatics (S.Kom)</strong><span>UIN Sunan Kalijaga Yogyakarta · 2021–2025</span></div></div>
-          <div className="pf-skills">{skillGroups.map(group => <div className="pf-skill-row" key={group.title}><h3>{group.title}</h3><p>{group.items}</p></div>)}</div></div>
-      </section>
-
-      <section className="pf-contact" id="contact"><div className="pf-contact-top"><span>04 / LET'S CONNECT</span><span>KENDARI · INDONESIA</span></div><h2>Have a role<br /><em>in mind?</em></h2><p>Open to junior software engineering and related IT opportunities.</p><a className="pf-contact-link" href={`mailto:${profile.email}`}>{profile.email}<ArrowUpRight size={30} /></a></section>
+          <div className="flex flex-col sm:flex-row justify-between gap-4 text-xs text-zinc-400 px-2 mt-12"><span>© {new Date().getFullYear()} {profile.name}</span><a href="#top" className="hover:text-white">Back to top ↑</a></div>
+        </footer>
+      </div>
     </main>
-    <footer className="pf-footer"><span>© {new Date().getFullYear()} {profile.name}</span><div><ExternalLink href={profile.github}>GitHub <ArrowUpRight size={15} /></ExternalLink><ExternalLink href={profile.linkedin}>LinkedIn <ArrowUpRight size={15} /></ExternalLink><a href={`mailto:${profile.email}`}>Email <Mail size={15} /></a></div><a href="#top">Back to top ↑</a></footer>
-  </div>;
+  </>;
 }

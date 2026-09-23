@@ -1,6 +1,14 @@
 @import "tailwindcss";
 @config "../tailwind.config.js";
 
+@font-face {
+  font-family: 'Inter Variable';
+  src: url('/inter-latin.woff2') format('woff2');
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+}
+
 @layer base {
   body {
     @apply min-h-screen bg-background text-white font-sans selection:bg-white selection:text-black overflow-x-hidden;
@@ -160,4 +168,13 @@
 /* ========================= */
 .transition-all.duration-400 {
   transition-duration: 400ms;
+}
+
+html { scroll-behavior: smooth; }
+section[id], div[id="projects"], div[id="about"], div[id="capabilities"], div[id="contact"] { scroll-margin-top: 5rem; }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .shooting-star, .star { animation: none; }
+  .section-wrapper, .reveal-on-scroll { opacity: 1; transform: none; transition: none; }
 }
