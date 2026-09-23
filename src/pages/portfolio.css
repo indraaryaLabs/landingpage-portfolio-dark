@@ -28,6 +28,7 @@ button { font: inherit; cursor: pointer; }
   backdrop-filter: blur(15px);
   -webkit-backdrop-filter: blur(15px);
 }
+.recon-nav-scrolled { background: #fff; }
 .recon-wordmark { width: max-content; font-size: 16px; font-weight: 650; letter-spacing: -.03em; }
 .recon-nav nav { display: flex; gap: 30px; font-size: 16px; font-weight: 600; }
 .recon-nav nav a:hover, .recon-footer-bottom a:hover, .recon-hero-link:hover { text-decoration: underline; text-underline-offset: 4px; }
@@ -73,22 +74,23 @@ button { font: inherit; cursor: pointer; }
 .recon-reel video { width: 100%; height: 100%; display: block; object-fit: cover; }
 
 .recon-work { position: relative; min-height: 4580px; scroll-margin-top: 76px; }
-.recon-work-title { padding: 215px 32px 0; text-align: center; }
+.recon-work-title { position: sticky; top: 0; z-index: 1; height: 100vh; padding: 0 32px 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
 .recon-work-title h2 { margin: 0; font-size: clamp(130px, 17vw, 220px); font-weight: 440; line-height: 1; letter-spacing: -.075em; white-space: nowrap; }
 .recon-work-title p { margin: 30px 0 0; color: #666; font-size: 13px; font-weight: 600; }
-.recon-work-card { position: absolute; width: min(450px, calc(100% - 32px)); }
+.recon-work-card { position: absolute; z-index: 5; width: min(450px, calc(100% - 32px)); background: #fff; }
 .recon-work-card-1 { top: 1165px; left: 6.3%; }
 .recon-work-card-2 { top: 2385px; right: 2.5%; }
 .recon-work-card-3 { top: 3410px; left: 28.3%; }
 .recon-work-card a { display: block; }
-.recon-work-image { width: 100%; aspect-ratio: 450 / 310; overflow: hidden; border-radius: 12px; background: #e5e5e5; }
+.recon-work-image { position: relative; width: 100%; aspect-ratio: 450 / 310; overflow: hidden; border-radius: 12px; background: #e5e5e5; }
 .recon-work-image img { width: 100%; height: 100%; display: block; object-fit: cover; transition: transform .45s ease; }
 .recon-work-card a:hover img { transform: scale(1.025); }
-.recon-work-caption { display: flex; justify-content: space-between; padding: 15px 2px 0; }
+.recon-work-overlay { position: absolute; inset: 0; padding: 22px; display: flex; flex-direction: column; justify-content: end; gap: 12px; background: rgba(14, 14, 14, .9); color: #fff; opacity: 0; transition: opacity .25s ease; }
+.recon-work-card a:hover .recon-work-overlay, .recon-work-card a:focus-visible .recon-work-overlay { opacity: 1; }
+.recon-work-overlay span, .recon-work-overlay small { font-size: 12px; line-height: 1.3; }
+.recon-work-overlay p { margin: 0; font-size: 17px; line-height: 1.3; }
+.recon-work-caption { height: 40px; padding: 8px 2px 0; }
 .recon-work-caption strong { display: block; font-size: 20px; line-height: 1.2; letter-spacing: -.04em; }
-.recon-work-caption small { display: block; margin-top: 3px; font-size: 13px; color: #555; }
-.recon-work-summary { max-width: 440px; margin: 15px 2px 0; color: #343434; font-size: 15px; line-height: 1.45; }
-.recon-art-note { margin: 9px 2px 0; color: #626262; font-size: 12px; line-height: 1.3; }
 
 .recon-about { min-height: 1545px; max-width: 1440px; margin: 0 auto; padding: 0 32px 110px; scroll-margin-top: 76px; }
 .recon-about h2 { margin: 0 0 95px; font-size: clamp(86px, 8vw, 120px); line-height: 1; font-weight: 440; letter-spacing: -.08em; }
@@ -101,6 +103,7 @@ button { font: inherit; cursor: pointer; }
 .recon-timeline-row strong { font-size: 17px; font-weight: 550; }
 .recon-timeline-row div > p { max-width: 600px; margin: 14px 0 0; color: #3c3c3c; font-size: 15px; line-height: 1.45; }
 .recon-timeline-row a { display: inline-block; margin-top: 16px; font-size: 13px; font-weight: 700; }
+.recon-visual-note { max-width: 500px; margin: 0 0 0 auto; color: #555; font-size: 13px; line-height: 1.4; }
 
 .recon-footer { position: relative; min-height: 468px; max-width: 1440px; margin: 0 auto; padding: 85px 32px 28px; border-top: 1px solid #c9c8c8; text-align: center; }
 .recon-footer h2 { margin: 0 0 34px; font-size: clamp(72px, 8vw, 120px); font-weight: 440; line-height: .88; letter-spacing: -.075em; }
@@ -139,14 +142,15 @@ button { font: inherit; cursor: pointer; }
   .recon-hero-copy p:nth-of-type(2) { font-size: 15px; }
   .recon-hero-link { margin-top: 14px; }
   .recon-reel { height: 345px; }
-  .recon-work { min-height: 3860px; }
-  .recon-work-title { padding: 95px 16px 0; }
-  .recon-work-title h2 { max-width: 600px; margin: 0 auto; font-size: clamp(64px, 13vw, 110px); line-height: .92; white-space: normal; }
+  .recon-work { min-height: 3804px; }
+  .recon-work-title { padding: 0 16px; }
+  .recon-work-title h2 { max-width: none; margin: 0 auto; font-size: clamp(50px, 14.5vw, 62px); line-height: 1; letter-spacing: -.01em; white-space: nowrap; }
   .recon-work-title p { margin-top: 23px; }
   .recon-work-card { right: auto; left: 50%; transform: translateX(-50%); }
-  .recon-work-card-1 { top: 650px; }
-  .recon-work-card-2 { top: 1725px; }
-  .recon-work-card-3 { top: 2775px; }
+  .recon-work-image { aspect-ratio: auto; height: 320px; }
+  .recon-work-card-1 { top: 1084px; }
+  .recon-work-card-2 { top: 1904px; }
+  .recon-work-card-3 { top: 2684px; }
   .recon-about { min-height: 1795px; padding: 0 16px 100px; }
   .recon-about h2 { margin-bottom: 65px; font-size: 76px; }
   .recon-about-intro { display: block; margin-bottom: 110px; }
@@ -162,12 +166,12 @@ button { font: inherit; cursor: pointer; }
 
 @media (max-width: 430px) {
   .recon-hero-copy h1 { font-size: 60px; }
-  .recon-work-title h2 { font-size: 66px; }
-  .recon-work-caption strong { font-size: 18px; }
+  .recon-work-title h2 { font-size: clamp(50px, 14.5vw, 62px); }
+  .recon-work-caption strong { font-size: 20px; }
   .recon-about-intro h3, .recon-about-intro p { font-size: 20px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .recon-email, .recon-work-image img { transition: none; }
+  .recon-email, .recon-work-image img, .recon-work-overlay { transition: none; }
 }
