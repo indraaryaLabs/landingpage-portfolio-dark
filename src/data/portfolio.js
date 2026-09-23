@@ -26,6 +26,7 @@ export const experience = [
 
 export const projects = [
   {
+    slot: 1,
     number: '01',
     name: 'Jejak Karier',
     category: 'Mobile application',
@@ -35,6 +36,7 @@ export const projects = [
     art: 'mobile',
   },
   {
+    slot: 2,
     number: '02',
     name: 'Reliability Command Center',
     category: 'Full-stack systems project',
@@ -44,6 +46,7 @@ export const projects = [
     art: 'systems',
   },
   {
+    slot: 3,
     number: '03',
     name: 'E-commerce ETL Pipeline',
     category: 'Data engineering project',

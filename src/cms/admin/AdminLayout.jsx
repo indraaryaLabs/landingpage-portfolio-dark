@@ -1,40 +1,19 @@
-import React, { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../AuthContext';
 import { ToastProvider } from './components/Toast';
-import { getUnreadMessageCount } from '../../lib/supabaseApi';
-import {
-  LayoutDashboard, Settings, Briefcase, FolderKanban,
-  ListOrdered, Tag, ShieldCheck, Mail, ExternalLink,
-  LogOut, Menu, X, MessageSquareQuote, HelpCircle
-} from 'lucide-react';
+import { LayoutDashboard, FolderKanban, ExternalLink, LogOut, Menu, X } from 'lucide-react';
 import '../admin.css';
 
 const NAV_ITEMS = [
   { label: 'Overview', to: '/admin', icon: LayoutDashboard, end: true },
-  { type: 'label', text: 'Content' },
-  { label: 'Site Settings', to: '/admin/settings', icon: Settings },
-  { label: 'Experience', to: '/admin/experience', icon: Briefcase },
-  { label: 'Projects', to: '/admin/projects', icon: FolderKanban },
-  { label: 'Process Steps', to: '/admin/process', icon: ListOrdered },
-  { label: 'Services', to: '/admin/services', icon: Tag },
-  { label: 'Why Choose Me', to: '/admin/why-me', icon: ShieldCheck },
-  { type: 'label', text: 'Reviews & FAQ' },
-  { label: 'Testimonials', to: '/admin/testimonials', icon: MessageSquareQuote },
-  { label: 'FAQ', to: '/admin/faq', icon: HelpCircle },
-  { type: 'label', text: 'Communication' },
-  { label: 'Messages', to: '/admin/messages', icon: Mail, hasBadge: true },
+  { label: 'Project Images', to: '/admin/projects', icon: FolderKanban },
 ];
 
 export default function AdminLayout() {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [unreadCount, setUnreadCount] = useState(0);
-
-  useEffect(() => {
-    getUnreadMessageCount().then(setUnreadCount).catch(() => {});
-  }, []);
 
   async function handleLogout() {
     await signOut();
@@ -71,9 +50,6 @@ export default function AdminLayout() {
                 >
                   <item.icon className="nav-icon" />
                   {item.label}
-                  {item.hasBadge && unreadCount > 0 && (
-                    <span className="badge">{unreadCount}</span>
-                  )}
                 </NavLink>
               );
             })}
@@ -114,7 +90,7 @@ export default function AdminLayout() {
           </header>
 
           <main className="admin-content">
-            <Outlet context={{ setUnreadCount }} />
+            <Outlet />
           </main>
         </div>
       </div>

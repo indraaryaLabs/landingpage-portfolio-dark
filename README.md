@@ -1,6 +1,6 @@
 # Indra Arya — software engineering portfolio
 
-Source for [indraarya.vercel.app](https://indraarya.vercel.app/), a portfolio for Indra Arya Slamet Praditya. The public page presents verified experience, selected projects and contact information.
+Source for [indraarya.satuarah.click](https://indraarya.satuarah.click/), a portfolio for Indra Arya Slamet Praditya. The public page presents verified experience, selected projects and contact information.
 
 ## What is on the public page
 
@@ -21,11 +21,13 @@ npm run dev
 
 Open `http://localhost:5173`. Run `npm run build` for a production build.
 
-The public portfolio is rendered from local data and does not require Supabase credentials. The repository still contains an older CMS/admin implementation that uses Supabase; it is not the source of the current public homepage. Do not run the legacy seed scripts without reviewing their content, because the starter records contain unsupported sample claims.
+The public copy is rendered from local data; Supabase is optional for displaying the page. The protected editor at `/admin/projects` uses Supabase Auth, the existing `projects` table and the `portfolio-media` Storage bucket to let the owner upload a 16:9 screenshot for each verified project. The screenshot is resized and saved as WebP. An image is used publicly only when its stored slot and project URL match the verified project. Until then, the page shows a lightweight illustration.
+
+Set `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` in the hosting environment to enable the editor and public project images. Storage upload and table update policies must permit the authenticated owner. Never put a Supabase service-role key in `VITE_` variables. The old CMS files remain in the repository for reference, but only the project-image editor is routed. Do not run the legacy seed scripts: their starter records include unsupported sample claims.
 
 ## Stack
 
-React, Vite, CSS, Lucide. Legacy CMS/admin code additionally uses Supabase.
+React, Vite, CSS, self-hosted Manrope and Instrument Serif fonts, Lucide, and Supabase for project-image editing.
 
 ## Contact
 
