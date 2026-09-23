@@ -41,9 +41,11 @@ export default function Hero() {
             <CircleDot className="w-3.5 h-3.5 text-white/80" strokeWidth={2.5} /> {badge}
           </div>
 
-          <h1 className="text-5xl md:text-7xl lg:text-[80px] tracking-tight leading-[1] mb-5 flex items-center flex-wrap gap-x-3">
-            <span className="text-white font-medium">{firstName}</span>
-            <span className="text-zinc-500 font-normal">{lastName}</span>
+          <div className="flex items-center flex-wrap gap-x-3 mb-5">
+            <h1 className="text-5xl md:text-7xl lg:text-[80px] tracking-tight leading-[1] flex items-center flex-wrap gap-x-3">
+              <span className="text-white font-medium">{firstName}</span>
+              <span className="text-zinc-500 font-normal">{lastName}</span>
+            </h1>
             <button
               onClick={(e) => { e.preventDefault(); document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' }); }}
               aria-label="Learn about Indra"
@@ -56,7 +58,7 @@ export default function Hero() {
             >
               <ArrowUpRight className="w-5 h-5 md:w-[22px] md:h-[22px] text-white" strokeWidth={1.5} />
             </button>
-          </h1>
+          </div>
 
           <p className="text-sm md:text-base text-zinc-400 max-w-sm mb-8 leading-relaxed">
             {heading}
