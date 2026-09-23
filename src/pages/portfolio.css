@@ -1,95 +1,173 @@
-:root{font-family:'Inter Tight Variable','Arial Narrow',Arial,sans-serif;color:#131313;background:#fff;font-synthesis:none}
-*{box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{margin:0;min-width:320px}
-button,a{font:inherit}
-a{color:inherit;text-decoration:none}
-button{cursor:pointer}
-::selection{background:#e9ec4b;color:#111}
-.lofi-site{min-height:100vh;background:#fff;overflow-x:clip}
-.lofi-site :focus-visible{outline:3px solid #111;outline-offset:4px}
-.lofi-header{height:76px;position:sticky;top:0;z-index:50;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:28px;padding:0 32px;background:rgba(255,255,255,.97)}
-.lofi-wordmark{font-size:16px;font-weight:700;letter-spacing:-.025em;white-space:nowrap}
-.lofi-header nav{display:flex;gap:34px;font-size:16px;font-weight:650}
-.lofi-header nav a:hover,.lofi-footer-bottom a:hover,.lofi-text-link:hover,.lofi-timeline-link:hover{text-decoration:underline;text-underline-offset:4px}
-.lofi-email{border:0;border-radius:999px;padding:13px 18px 13px 22px;min-height:44px;display:inline-flex;align-items:center;justify-content:space-between;gap:18px;background:#171717;color:white;font-size:14px;font-weight:700;white-space:nowrap;transition:transform .2s,background .2s}
-.lofi-email:hover{background:#303030;transform:translateY(-2px)}
-.lofi-email svg{width:18px;height:18px;flex:none}
-.lofi-header-email{justify-self:end;text-transform:uppercase}
-.lofi-hero{max-width:1000px;min-height:540px;margin:0 4vw 0 auto;padding:62px 28px 24px;display:grid;grid-template-columns:280px minmax(0,1fr);gap:70px;align-items:start}
-.lofi-hero-portrait{width:260px;height:260px;border-radius:50%;overflow:hidden;background:#e6e6e6;margin:0 auto}
-.lofi-hero-portrait img{width:100%;height:100%;object-fit:cover;object-position:50% 18%;filter:grayscale(1) contrast(1.08)}
-.lofi-hero h1{font-size:clamp(72px,8.5vw,128px);font-weight:520;letter-spacing:-.075em;line-height:.9;margin:0 0 32px}
-.lofi-hero-lead,.lofi-hero-secondary{font-size:clamp(20px,1.85vw,25px);line-height:1.22;letter-spacing:-.02em;max-width:620px}
-.lofi-hero-lead{font-weight:600;margin:0 0 26px}
-.lofi-hero-secondary{font-weight:430;margin:0;color:#373737}
-.lofi-hero-actions{display:flex;align-items:center;gap:24px;flex-wrap:wrap;margin-top:32px}
-.lofi-hero-actions .lofi-email{display:none}
-.lofi-text-link{font-size:13px;letter-spacing:.02em;font-weight:700;white-space:nowrap}
-.lofi-text-link span{font-size:18px;margin-left:6px}
-.lofi-teaser{height:360px;padding:0 max(32px,7vw);display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;background:#111;overflow:hidden}
-.lofi-teaser-panel{height:100%;overflow:hidden}
-.lofi-teaser .lofi-project-art{padding:18px}
-.lofi-teaser .lofi-art-center strong{font-size:clamp(28px,3vw,46px)}
-.lofi-teaser .lofi-art-mark{font-size:45px}
-.lofi-teaser .lofi-art-kicker,.lofi-teaser .lofi-art-bottom{font-size:10px}
-.lofi-work{padding:200px 32px 180px;scroll-margin-top:80px}
-.lofi-work-heading{max-width:1480px;margin:0 auto 85px;text-align:center}
-.lofi-work-heading h2{font-size:clamp(68px,12vw,190px);line-height:.98;letter-spacing:-.078em;font-weight:500;margin:0;white-space:nowrap}
-.lofi-work-heading p{font-size:14px;font-weight:650;letter-spacing:.02em;color:#686868;margin:28px 0 0}
-.lofi-feature{max-width:1460px;min-height:480px;margin:0 auto 95px;padding:34px 42px;display:flex;flex-direction:column;justify-content:space-between;background:#181818;color:#fff;overflow:hidden}
-.lofi-feature-top{display:flex;justify-content:space-between;gap:16px;font-size:13px;font-weight:700;letter-spacing:.08em}
-.lofi-feature-top span{color:#bbb}
-.lofi-feature-center{display:flex;align-items:end;justify-content:space-between;gap:20px}
-.lofi-feature-center strong{font-size:clamp(100px,17vw,260px);font-weight:500;letter-spacing:-.09em;line-height:.85;transition:transform .3s}
-.lofi-feature:hover .lofi-feature-center strong{transform:translateX(8px)}
-.lofi-feature-center>span{font-size:70px;line-height:1}
-.lofi-feature-bottom{max-width:52ch;font-size:19px;line-height:1.3;letter-spacing:-.015em}
-.lofi-project-grid{max-width:1460px;margin:0 auto;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px}
-.lofi-project-card{min-width:0}
-.lofi-project-link{display:block}
-.lofi-project-media{aspect-ratio:4/5;overflow:hidden;background:#e4e4e4}
-.lofi-project-image{width:100%;height:100%;object-fit:cover;display:block;transition:transform .5s ease}
-.lofi-project-link:hover .lofi-project-image,.lofi-project-link:hover .lofi-project-art{transform:scale(1.025)}
-.lofi-project-art{width:100%;height:100%;position:relative;padding:24px;display:flex;flex-direction:column;justify-content:space-between;overflow:hidden;transition:transform .5s ease}
-.lofi-project-art-1{background:#d7dce0;color:#161616}
-.lofi-project-art-1:before{content:'';position:absolute;width:72%;aspect-ratio:1;border-radius:50%;background:#bbc4c9;top:12%;right:-16%;filter:blur(1px)}
-.lofi-project-art-2{background:#181818;color:#f5f5f5}
-.lofi-project-art-2:before{content:'';position:absolute;inset:12%;border:1px solid rgba(255,255,255,.17);border-radius:50%;transform:scale(1.4)}
-.lofi-project-art-3{background:#f2ec4e;color:#161616}
-.lofi-project-art-3:before{content:'';position:absolute;inset:12% 15%;border-left:1px solid #16161633;border-right:1px solid #16161633}
-.lofi-art-kicker,.lofi-art-bottom{position:relative;z-index:1;font-size:12px;font-weight:650;letter-spacing:.1em}
-.lofi-art-center{position:relative;z-index:1;display:flex;align-items:end;justify-content:space-between;gap:10px}
-.lofi-art-center strong{font-size:clamp(38px,3.5vw,62px);line-height:.88;letter-spacing:-.08em;font-weight:700;white-space:pre-line;overflow-wrap:anywhere}
-.lofi-art-mark{font-size:clamp(44px,5vw,80px);line-height:1;font-weight:400}
-.lofi-project-caption{display:flex;align-items:start;justify-content:space-between;gap:18px;padding:23px 2px 0}
-.lofi-meta{font-size:12px;line-height:1.4;text-transform:uppercase;font-weight:700;color:#6d6d6d}
-.lofi-project-caption h3{font-size:27px;line-height:1.08;letter-spacing:-.045em;font-weight:600;margin:12px 0}
-.lofi-project-caption p{font-size:15px;line-height:1.5;color:#555;max-width:38ch;margin:0}
-.lofi-project-arrow{font-size:30px;line-height:1}
-.lofi-about{border-top:1px solid #dedede;max-width:1440px;margin:0 auto;padding:70px 32px 170px;scroll-margin-top:76px}
-.lofi-about>h2{font-size:clamp(76px,10vw,140px);letter-spacing:-.08em;line-height:1;font-weight:500;margin:0 0 70px}
-.lofi-about-intro{display:grid;grid-template-columns:1fr 1fr;gap:58px;margin-bottom:100px}
-.lofi-about-intro h3,.lofi-about-intro p{font-size:clamp(21px,2vw,27px);font-weight:470;line-height:1.25;letter-spacing:-.025em;margin:0}
-.lofi-about-intro p+p{margin-top:22px}
-.lofi-timeline{border-top:1px solid #d9d9d9}
-.lofi-timeline-row{display:grid;grid-template-columns:1fr 1fr;gap:58px;padding:34px 0 46px;border-bottom:1px solid #d9d9d9}
-.lofi-timeline-date,.lofi-timeline-row h3,.lofi-timeline-role{font-size:22px;line-height:1.2;letter-spacing:-.03em;margin:0;font-weight:550}
-.lofi-timeline-role{margin:5px 0 18px}
-.lofi-timeline-description{font-size:16px;line-height:1.5;max-width:600px;color:#404040;margin:0}
-.lofi-timeline-link{display:inline-block;margin-top:20px;font-size:13px;font-weight:700}
-.lofi-skills{display:grid;grid-template-columns:1fr 1fr;gap:58px;padding:60px 0 0}
-.lofi-skills h3{font-size:28px;font-weight:550;letter-spacing:-.04em;margin:0}
-.lofi-skills p{display:grid;grid-template-columns:100px 1fr;gap:16px;margin:0;padding:14px 0;border-bottom:1px solid #e4e4e4;font-size:16px;line-height:1.4}
-.lofi-skills p:first-child{padding-top:0}
-.lofi-skills p span{font-weight:700}
-.lofi-footer{border-top:1px solid #d9d9d9;padding:100px 32px 30px;min-height:630px}
-.lofi-footer-overline{font-size:14px;font-weight:700;letter-spacing:.05em;text-align:center;margin:0 0 25px}
-.lofi-footer h2{font-size:clamp(72px,11vw,160px);font-weight:500;line-height:.88;letter-spacing:-.078em;text-align:center;margin:0 0 45px}
-.lofi-footer>.lofi-email{display:flex;width:max-content;margin:0 auto}
-.lofi-footer-bottom{max-width:1440px;margin:160px auto 0;padding-top:24px;border-top:1px solid #e2e2e2;display:flex;justify-content:space-between;gap:20px;font-size:13px;font-weight:650}
-.lofi-footer-bottom div{display:flex;gap:26px;flex-wrap:wrap}
-@media(max-width:1050px){.lofi-hero{grid-template-columns:230px minmax(0,1fr);gap:45px}.lofi-hero-portrait{width:220px;height:220px}.lofi-hero h1{font-size:clamp(70px,8vw,96px)}.lofi-project-grid{gap:16px}.lofi-project-caption h3{font-size:23px}}
-@media(max-width:760px){.lofi-header{height:68px;grid-template-columns:1fr auto;padding:0 16px}.lofi-header nav{gap:26px;font-size:15px}.lofi-header-email{display:none}.lofi-hero{display:flex;flex-direction:column;align-items:flex-start;gap:40px;min-height:0;margin:0;padding:32px 16px 28px}.lofi-hero-portrait{width:240px;height:240px;margin:0}.lofi-hero h1{font-size:clamp(62px,14vw,86px);margin-bottom:34px}.lofi-hero-lead,.lofi-hero-secondary{font-size:21px;line-height:1.22}.lofi-hero-actions{gap:22px}.lofi-hero-actions .lofi-email{display:inline-flex}.lofi-teaser{height:170px;padding:0;gap:4px}.lofi-teaser .lofi-project-art{padding:10px}.lofi-teaser .lofi-art-center strong{font-size:18px}.lofi-teaser .lofi-art-mark,.lofi-teaser .lofi-art-bottom{display:none}.lofi-teaser .lofi-art-kicker{font-size:7px}.lofi-work{padding:100px 16px 100px}.lofi-work-heading{margin-bottom:50px}.lofi-work-heading h2{font-size:clamp(54px,13vw,90px);white-space:normal}.lofi-feature{min-height:350px;padding:20px;margin-bottom:65px}.lofi-feature-top{font-size:10px}.lofi-feature-center strong{font-size:clamp(65px,16vw,120px)}.lofi-feature-center>span{font-size:44px}.lofi-feature-bottom{font-size:16px}.lofi-project-grid{grid-template-columns:1fr;gap:65px}.lofi-project-media{aspect-ratio:1/1}.lofi-art-center strong{font-size:clamp(42px,11vw,65px)}.lofi-about{padding:25px 16px 100px}.lofi-about>h2{margin-bottom:42px}.lofi-about-intro,.lofi-timeline-row,.lofi-skills{grid-template-columns:1fr;gap:25px}.lofi-about-intro{margin-bottom:70px}.lofi-about-intro h3,.lofi-about-intro p{font-size:21px}.lofi-timeline-row{padding:30px 0 42px;gap:17px}.lofi-timeline-date,.lofi-timeline-row h3,.lofi-timeline-role{font-size:21px}.lofi-skills{padding-top:55px}.lofi-skills p{grid-template-columns:85px 1fr}.lofi-footer{padding:80px 16px 25px;min-height:0}.lofi-footer h2{font-size:clamp(61px,14vw,90px)}.lofi-footer-bottom{margin-top:120px;flex-direction:column}.lofi-footer-bottom div{gap:20px}}
-@media(max-width:390px){.lofi-header nav{gap:16px}.lofi-wordmark{font-size:14px}.lofi-header nav{font-size:14px}.lofi-email{font-size:12px}.lofi-text-link{font-size:12px}.lofi-hero-actions{gap:18px}}
-@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.lofi-email,.lofi-project-image,.lofi-project-art{transition:none}}
+:root {
+  font-family: 'Inter Tight Variable', 'Arial Narrow', Arial, sans-serif;
+  color: #0e0e0e;
+  background: #fff;
+  font-synthesis: none;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; min-width: 320px; }
+a { color: inherit; text-decoration: none; }
+button { font: inherit; cursor: pointer; }
+::selection { color: #0e0e0e; background: #fff500; }
+
+.recon-site { overflow-x: clip; background: #fff; }
+.recon-site :focus-visible { outline: 3px solid #1769ff; outline-offset: 4px; }
+
+.recon-nav {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  height: 76px;
+  padding: 0 32px;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  background: rgba(255, 255, 255, .8);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+}
+.recon-wordmark { width: max-content; font-size: 16px; font-weight: 650; letter-spacing: -.03em; }
+.recon-nav nav { display: flex; gap: 30px; font-size: 16px; font-weight: 600; }
+.recon-nav nav a:hover, .recon-footer-bottom a:hover, .recon-hero-link:hover { text-decoration: underline; text-underline-offset: 4px; }
+.recon-nav .recon-email { justify-self: end; }
+.recon-email {
+  min-height: 42px;
+  padding: 11px 17px 11px 19px;
+  border: 0;
+  border-radius: 100px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  background: #0e0e0e;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+  transition: background-color .2s ease, transform .2s ease;
+}
+.recon-email:hover { background: #323232; transform: translateY(-2px); }
+.recon-email svg { flex: none; }
+.recon-email-compact { text-transform: uppercase; }
+
+.recon-hero { height: 548px; padding: 64px 24px 0; }
+.recon-hero-inner {
+  width: min(960px, 100%);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 350px minmax(0, 1fr);
+  gap: 80px;
+  align-items: start;
+}
+.recon-portrait { width: 250px; height: 250px; margin-left: auto; border-radius: 50%; overflow: hidden; background: #ebebeb; }
+.recon-portrait img { width: 100%; height: 100%; display: block; object-fit: cover; }
+.recon-hero-copy h1 { margin: 0 0 31px; font-size: clamp(74px, 7.1vw, 96px); line-height: .9; font-weight: 440; letter-spacing: -.075em; }
+.recon-hero-copy p { max-width: 440px; margin: 0 0 18px; font-size: 21px; line-height: 1.23; letter-spacing: -.025em; }
+.recon-hero-copy p:nth-of-type(2) { font-size: 17px; line-height: 1.35; }
+.recon-hero-link { display: inline-block; margin-top: 10px; font-size: 13px; font-weight: 700; text-transform: uppercase; }
+.recon-hero-link span { margin-left: 8px; font-size: 18px; }
+
+.recon-reel { height: 500px; overflow: hidden; background: #050505; }
+.recon-reel video { width: 100%; height: 100%; display: block; object-fit: cover; }
+
+.recon-work { position: relative; min-height: 4580px; scroll-margin-top: 76px; }
+.recon-work-title { padding: 215px 32px 0; text-align: center; }
+.recon-work-title h2 { margin: 0; font-size: clamp(130px, 17vw, 220px); font-weight: 440; line-height: 1; letter-spacing: -.075em; white-space: nowrap; }
+.recon-work-title p { margin: 30px 0 0; color: #666; font-size: 13px; font-weight: 600; }
+.recon-work-card { position: absolute; width: min(450px, calc(100% - 32px)); }
+.recon-work-card-1 { top: 1165px; left: 6.3%; }
+.recon-work-card-2 { top: 2385px; right: 2.5%; }
+.recon-work-card-3 { top: 3410px; left: 28.3%; }
+.recon-work-card a { display: block; }
+.recon-work-image { width: 100%; aspect-ratio: 450 / 310; overflow: hidden; border-radius: 12px; background: #e5e5e5; }
+.recon-work-image img { width: 100%; height: 100%; display: block; object-fit: cover; transition: transform .45s ease; }
+.recon-work-card a:hover img { transform: scale(1.025); }
+.recon-work-caption { display: flex; justify-content: space-between; padding: 15px 2px 0; }
+.recon-work-caption strong { display: block; font-size: 20px; line-height: 1.2; letter-spacing: -.04em; }
+.recon-work-caption small { display: block; margin-top: 3px; font-size: 13px; color: #555; }
+.recon-work-summary { max-width: 440px; margin: 15px 2px 0; color: #343434; font-size: 15px; line-height: 1.45; }
+.recon-art-note { margin: 9px 2px 0; color: #626262; font-size: 12px; line-height: 1.3; }
+
+.recon-about { min-height: 1545px; max-width: 1440px; margin: 0 auto; padding: 0 32px 110px; scroll-margin-top: 76px; }
+.recon-about h2 { margin: 0 0 95px; font-size: clamp(86px, 8vw, 120px); line-height: 1; font-weight: 440; letter-spacing: -.08em; }
+.recon-about-intro { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; margin-bottom: 195px; }
+.recon-about-intro h3, .recon-about-intro p { max-width: 565px; margin: 0; font-size: 24px; line-height: 1.25; font-weight: 480; letter-spacing: -.028em; }
+.recon-about-intro p + p { margin-top: 23px; }
+.recon-timeline-row { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; min-height: 230px; padding: 0 0 48px; }
+.recon-timeline-row > p { margin: 0; font-size: 17px; line-height: 1.4; font-weight: 500; }
+.recon-timeline-row h3 { margin: 0 0 6px; font-size: 20px; font-weight: 650; letter-spacing: -.03em; }
+.recon-timeline-row strong { font-size: 17px; font-weight: 550; }
+.recon-timeline-row div > p { max-width: 600px; margin: 14px 0 0; color: #3c3c3c; font-size: 15px; line-height: 1.45; }
+.recon-timeline-row a { display: inline-block; margin-top: 16px; font-size: 13px; font-weight: 700; }
+
+.recon-footer { position: relative; min-height: 468px; max-width: 1440px; margin: 0 auto; padding: 85px 32px 28px; border-top: 1px solid #c9c8c8; text-align: center; }
+.recon-footer h2 { margin: 0 0 34px; font-size: clamp(72px, 8vw, 120px); font-weight: 440; line-height: .88; letter-spacing: -.075em; }
+.recon-footer-bottom { position: absolute; right: 32px; bottom: 27px; left: 32px; display: flex; justify-content: space-between; font-size: 13px; font-weight: 650; }
+.recon-footer-bottom div { display: flex; gap: 18px; }
+
+@media (min-width: 1300px) {
+  .recon-hero { height: 622px; }
+  .recon-reel { height: 850px; }
+  .recon-work { min-height: 5060px; }
+  .recon-work-card-1 { top: 1265px; }
+  .recon-work-card-2 { top: 2650px; }
+  .recon-work-card-3 { top: 3720px; }
+  .recon-about { min-height: 1638px; }
+  .recon-footer { min-height: 598px; padding-top: 145px; }
+}
+
+@media (min-width: 810px) and (max-width: 1050px) {
+  .recon-hero-inner { grid-template-columns: 260px minmax(0, 1fr); gap: 50px; }
+  .recon-hero-copy h1 { font-size: 74px; }
+  .recon-work-title h2 { font-size: 10vw; }
+  .recon-work-card-3 { left: calc(50% - 225px); }
+}
+
+@media (max-width: 809px) {
+  .recon-nav { height: 76px; padding: 0 16px; grid-template-columns: 1fr auto; }
+  .recon-wordmark { font-size: 14px; }
+  .recon-nav nav { gap: 26px; font-size: 14px; }
+  .recon-nav .recon-email { display: none; }
+  .recon-hero { height: 750px; padding: 34px 16px 0; }
+  .recon-hero-inner { display: flex; flex-direction: column; gap: 55px; }
+  .recon-portrait { width: 249px; height: 249px; margin: 0 auto; }
+  .recon-hero-copy { width: 100%; text-align: center; }
+  .recon-hero-copy h1 { margin-bottom: 34px; font-size: clamp(58px, 12vw, 86px); }
+  .recon-hero-copy p { max-width: 440px; margin: 0 auto 16px; font-size: 19px; }
+  .recon-hero-copy p:nth-of-type(2) { font-size: 15px; }
+  .recon-hero-link { margin-top: 14px; }
+  .recon-reel { height: 345px; }
+  .recon-work { min-height: 3860px; }
+  .recon-work-title { padding: 95px 16px 0; }
+  .recon-work-title h2 { max-width: 600px; margin: 0 auto; font-size: clamp(64px, 13vw, 110px); line-height: .92; white-space: normal; }
+  .recon-work-title p { margin-top: 23px; }
+  .recon-work-card { right: auto; left: 50%; transform: translateX(-50%); }
+  .recon-work-card-1 { top: 650px; }
+  .recon-work-card-2 { top: 1725px; }
+  .recon-work-card-3 { top: 2775px; }
+  .recon-about { min-height: 1795px; padding: 0 16px 100px; }
+  .recon-about h2 { margin-bottom: 65px; font-size: 76px; }
+  .recon-about-intro { display: block; margin-bottom: 110px; }
+  .recon-about-intro h3, .recon-about-intro p { font-size: 22px; }
+  .recon-about-intro h3 { margin-bottom: 28px; }
+  .recon-timeline-row { display: block; min-height: 0; margin-bottom: 70px; padding: 0; }
+  .recon-timeline-row > p { margin-bottom: 18px; }
+  .recon-timeline-row h3 { font-size: 21px; }
+  .recon-footer { min-height: 503px; padding: 95px 16px 25px; }
+  .recon-footer h2 { font-size: clamp(58px, 12vw, 90px); }
+  .recon-footer-bottom { right: 16px; bottom: 25px; left: 16px; }
+}
+
+@media (max-width: 430px) {
+  .recon-hero-copy h1 { font-size: 60px; }
+  .recon-work-title h2 { font-size: 66px; }
+  .recon-work-caption strong { font-size: 18px; }
+  .recon-about-intro h3, .recon-about-intro p { font-size: 20px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .recon-email, .recon-work-image img { transition: none; }
+}

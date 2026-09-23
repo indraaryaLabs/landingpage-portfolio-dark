@@ -1,42 +1,47 @@
 import { useEffect, useState } from 'react';
-import { experience, profile, projects, skillGroups } from '../data/portfolio';
+import { experience, profile, projects } from '../data/portfolio';
 import '@fontsource-variable/inter-tight/wght.css';
 import './portfolio.css';
 
-function EmailButton({ className = '' }) {
+// The supplied RECON export keeps these original Framer assets as temporary artwork.
+// They are not presented as Indra's portrait or as screenshots of his projects.
+const templateAssets = {
+  portrait: 'https://framerusercontent.com/images/JQqsD7xecQfWDLwoSTpvjAMyVw.png?scale-down-to=512&width=768&height=768',
+  reel: 'https://framerusercontent.com/assets/qrR62CWXqDhpxD9VshrTGooXZg.mp4',
+  projects: [
+    'https://framerusercontent.com/images/R1r7VFivZ1p7eirOLoMdE5NV80M.jpg?scale-down-to=1024',
+    'https://framerusercontent.com/images/conknpf49hPAVpbVfu0eEPiE4SM.jpeg?scale-down-to=1024',
+    'https://framerusercontent.com/images/h25SyziLUKTHENOdmXtNMuyOHdM.jpg?scale-down-to=1024',
+  ],
+};
+
+function EmailButton({ compact = false }) {
   const [copied, setCopied] = useState(false);
 
   async function copyEmail() {
     try {
       await navigator.clipboard.writeText(profile.email);
       setCopied(true);
+      window.setTimeout(() => setCopied(false), 2500);
     } catch {
       window.location.href = `mailto:${profile.email}`;
     }
   }
 
-  return <button type="button" className={`lofi-email ${className}`} onClick={copyEmail} aria-label={copied ? 'Email address copied' : `Copy email address ${profile.email}`}>
-    <span>{copied ? 'EMAIL COPIED' : profile.email}</span>
-    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none"><rect x="8" y="8" width="11" height="12" rx="1.5" stroke="currentColor" strokeWidth="1.7" /><path d="M16 8V5.5A1.5 1.5 0 0 0 14.5 4h-9A1.5 1.5 0 0 0 4 5.5v10A1.5 1.5 0 0 0 5.5 17H8" stroke="currentColor" strokeWidth="1.7" /></svg>
+  return <button type="button" className={`recon-email${compact ? ' recon-email-compact' : ''}`} onClick={copyEmail} aria-label={copied ? 'Email address copied' : `Copy email address ${profile.email}`}>
+    <span>{copied ? 'EMAIL COPIED!' : profile.email}</span>
+    <svg viewBox="0 0 20 20" width="16" height="16" fill="none" aria-hidden="true"><rect x="7" y="7" width="9" height="10" rx="1" stroke="currentColor" strokeWidth="1.4" /><path d="M13 7V4.5A1.5 1.5 0 0 0 11.5 3h-7A1.5 1.5 0 0 0 3 4.5v8A1.5 1.5 0 0 0 4.5 14H7" stroke="currentColor" strokeWidth="1.4" /></svg>
   </button>;
 }
 
-function ProjectArt({ project, image }) {
-  if (image) return <img className="lofi-project-image" src={image} alt={`${project.name} project screenshot`} loading="lazy" decoding="async" width="1200" height="675" />;
-
-  return <div className={`lofi-project-art lofi-project-art-${project.slot}`} aria-hidden="true">
-    <span className="lofi-art-kicker">INDRA ARYA / PROJECT 0{project.slot}</span>
-    <div className="lofi-art-center"><strong>{project.slot === 1 ? 'JEJAK\nKARIER' : project.slot === 2 ? 'RELIABILITY\nCOMMAND CENTER' : 'E-COMMERCE\nETL PIPELINE'}</strong><span className="lofi-art-mark">{project.slot === 1 ? '↗' : project.slot === 2 ? '◌' : '→'}</span></div>
-    <span className="lofi-art-bottom">{project.stack.slice(0, 3).join(' / ')}</span>
-  </div>;
-}
-
-function ProjectCard({ project, image }) {
-  return <article className="lofi-project-card">
-    <a className="lofi-project-link" href={project.link} target="_blank" rel="noopener noreferrer">
-      <div className="lofi-project-media"><ProjectArt project={project} image={image} /></div>
-      <div className="lofi-project-caption"><div><span className="lofi-meta">0{project.slot} / {project.category}</span><h3>{project.name}</h3><p>{project.summary}</p></div><span className="lofi-project-arrow" aria-hidden="true">↗</span></div>
+function WorkCard({ project, index, image }) {
+  return <article className={`recon-work-card recon-work-card-${index + 1}`}>
+    <a href={project.link} target="_blank" rel="noopener noreferrer" aria-label={`View ${project.name} repository`}>
+      <div className="recon-work-image"><img src={image || templateAssets.projects[index]} alt={image ? `${project.name} project screenshot` : 'Temporary artwork from the supplied portfolio template'} loading="lazy" decoding="async" width="450" height="310" /></div>
+      <div className="recon-work-caption"><span><strong>{project.name}</strong><small>{project.category} <span aria-hidden="true">↗</span></small></span></div>
     </a>
+    <p className="recon-work-summary">{project.summary}</p>
+    {!image && <p className="recon-art-note">Template artwork · project image to be replaced</p>}
   </article>;
 }
 
@@ -45,7 +50,7 @@ export default function Home() {
 
   useEffect(() => {
     if (!import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_ANON_KEY) return;
-    const section = document.getElementById('teaser');
+    const section = document.getElementById('work');
     if (!section) return;
     let cancelled = false;
     const observer = new IntersectionObserver((entries) => {
@@ -59,32 +64,20 @@ export default function Home() {
           if (row?.image_url) images[project.slot] = row.image_url;
         }
         setProjectImages(images);
-      }).catch(() => { /* Original project artwork remains when CMS is unavailable. */ });
-    }, { rootMargin: '400px' });
+      }).catch(() => { /* Keep the supplied template artwork when CMS is unavailable. */ });
+    }, { rootMargin: '500px' });
     observer.observe(section);
     return () => { cancelled = true; observer.disconnect(); };
   }, []);
 
-  return <div className="lofi-site" id="top">
-    <header className="lofi-header"><a className="lofi-wordmark" href="#top">INDRA ARYA</a><nav aria-label="Main navigation"><a href="#work">WORK</a><a href="#about">ABOUT</a></nav><EmailButton className="lofi-header-email" /></header>
+  return <div className="recon-site" id="top">
+    <header className="recon-nav"><a className="recon-wordmark" href="#top">Indra Arya</a><nav aria-label="Main navigation"><a href="#work">Work</a><a href="#about">About</a></nav><EmailButton compact /></header>
     <main>
-      <section className="lofi-hero" aria-labelledby="lofi-title">
-        <div className="lofi-hero-portrait"><img src="/indra-portrait-480.jpg" alt="Portrait of Indra Arya" width="480" height="480" fetchPriority="high" /></div>
-        <div className="lofi-hero-copy"><h1 id="lofi-title">Software<br />Engineer</h1><p className="lofi-hero-lead">I build useful software across web, mobile, and data workflows.</p><p className="lofi-hero-secondary">At PickFrame, I worked across Go APIs and React. I’m now available for junior roles across Indonesia.</p><div className="lofi-hero-actions"><EmailButton /><a className="lofi-text-link" href="https://pickframe.satuarah.click" target="_blank" rel="noopener noreferrer">VIEW LIVE PRODUCT <span aria-hidden="true">↗</span></a></div></div>
-      </section>
-      <div className="lofi-teaser" id="teaser" aria-hidden="true">{projects.map(project => <div className="lofi-teaser-panel" key={project.slot}><ProjectArt project={project} image={projectImages[project.slot]} /></div>)}</div>
-
-      <section className="lofi-work" id="work" aria-labelledby="work-title"><div className="lofi-work-heading"><h2 id="work-title">Featured work</h2><p>(SCROLL TO EXPLORE)</p></div>
-        <a className="lofi-feature" href="https://pickframe.satuarah.click" target="_blank" rel="noopener noreferrer" aria-label="View the PickFrame live product">
-          <span className="lofi-feature-top">SELECTED LIVE PRODUCT <span>2026 / FREELANCE</span></span>
-          <span className="lofi-feature-center"><strong>PickFrame</strong><span aria-hidden="true">↗</span></span>
-          <span className="lofi-feature-bottom">A photography business platform covering galleries, orders, invoices, subscriptions and an operator dashboard. Built across Go, PostgreSQL and React.</span>
-        </a>
-        <div className="lofi-project-grid">{projects.map(project => <ProjectCard key={project.slot} project={project} image={projectImages[project.slot]} />)}</div>
-      </section>
-
-      <section className="lofi-about" id="about" aria-labelledby="about-title"><h2 id="about-title">About</h2><div className="lofi-about-intro"><h3>Practical engineering, grounded in real product work.</h3><div><p>I’m Indra, an Informatics graduate from UIN Sunan Kalijaga Yogyakarta (2025, GPA 3.54/4.00). My freelance work on PickFrame covered a live product’s APIs, database and frontend; my public repositories show mobile, monitoring and data-pipeline projects.</p><p>I’m based in Kendari, available immediately, and open to on-site, hybrid or remote roles across Indonesia.</p></div></div><div className="lofi-timeline">{experience.map(item => <article className="lofi-timeline-row" key={item.company}><p className="lofi-timeline-date">{item.period}</p><div><h3>{item.company}</h3><p className="lofi-timeline-role">{item.role} · {item.location}</p><p className="lofi-timeline-description">{item.description}</p>{item.link && <a href={item.link} target="_blank" rel="noopener noreferrer" className="lofi-timeline-link">VIEW PRODUCT ↗</a>}</div></article>)}<div className="lofi-timeline-row"><p className="lofi-timeline-date">2021–2025</p><div><h3>UIN Sunan Kalijaga Yogyakarta</h3><p className="lofi-timeline-role">Bachelor of Informatics (S.Kom) · GPA 3.54/4.00</p></div></div></div><div className="lofi-skills"><h3>Tools I use</h3><div>{skillGroups.map(group => <p key={group.title}><span>{group.title}</span>{group.items}</p>)}</div></div></section>
+      <section className="recon-hero" aria-labelledby="hero-title"><div className="recon-hero-inner"><div className="recon-portrait"><img src={templateAssets.portrait} alt="Template portrait placeholder; not a photo of Indra" width="350" height="350" fetchPriority="high" /></div><div className="recon-hero-copy"><h1 id="hero-title">Software<br />Engineer</h1><p>I build practical software across web, mobile, and data workflows.</p><p>My freelance work on PickFrame covered Go APIs, PostgreSQL, and React. I’m based in Kendari and open to junior roles across Indonesia.</p><a className="recon-hero-link" href="https://pickframe.satuarah.click" target="_blank" rel="noopener noreferrer">View live product <span aria-hidden="true">↗</span></a></div></div></section>
+      <div className="recon-reel" aria-hidden="true"><video src={templateAssets.reel} autoPlay muted loop playsInline preload="metadata" /></div>
+      <section className="recon-work" id="work" aria-labelledby="work-title"><div className="recon-work-title"><h2 id="work-title">Featured work</h2><p>(SCROLL TO EXPLORE)</p></div>{projects.map((project, index) => <WorkCard key={project.slot} project={project} index={index} image={projectImages[project.slot]} />)}</section>
+      <section className="recon-about" id="about" aria-labelledby="about-title"><h2 id="about-title">About</h2><div className="recon-about-intro"><h3>Building useful digital products across interfaces, APIs, and data.</h3><div><p>I’m Indra, an Informatics graduate from UIN Sunan Kalijaga Yogyakarta. My freelance work on PickFrame covered a live product’s backend, database, and frontend.</p><p>My public projects include a mobile job tracker, a service-operations dashboard, and an e-commerce data pipeline. I’m available immediately for junior IT roles across Indonesia.</p></div></div><div className="recon-timeline">{experience.map(item => <article className="recon-timeline-row" key={item.company}><p>{item.period}</p><div><h3>{item.company}</h3><strong>{item.role} · {item.location}</strong><p>{item.description}</p>{item.link && <a href={item.link} target="_blank" rel="noopener noreferrer">View live product ↗</a>}</div></article>)}<article className="recon-timeline-row"><p>2021–2025</p><div><h3>UIN Sunan Kalijaga Yogyakarta</h3><strong>Bachelor of Informatics (S.Kom) · GPA 3.54/4.00</strong><p>Studied data structures, databases, web programming, and software engineering.</p></div></article></div></section>
     </main>
-    <footer className="lofi-footer" id="contact"><p className="lofi-footer-overline">LET’S GET TO KNOW EACH OTHER</p><h2>Have a role<br />in mind?</h2><EmailButton /><div className="lofi-footer-bottom"><span>© {new Date().getFullYear()} {profile.name}</span><div><a href={profile.github} target="_blank" rel="noopener noreferrer">GITHUB ↗</a><a href={profile.linkedin} target="_blank" rel="noopener noreferrer">LINKEDIN ↗</a><a href="#top">BACK TO TOP ↑</a></div></div></footer>
+    <footer className="recon-footer"><h2>Let’s get to know<br />each other</h2><EmailButton compact /><div className="recon-footer-bottom"><div><a href={profile.github} target="_blank" rel="noopener noreferrer">GH</a><a href={profile.linkedin} target="_blank" rel="noopener noreferrer">IN</a></div><span>© {new Date().getFullYear()} Indra Arya</span></div></footer>
   </div>;
 }
