@@ -34,7 +34,7 @@ export default function LoginPage() {
   }
 
   return <div className="admin-login-page"><div className="admin-login-card">
-    <div className="admin-login-mark">IA <span>PORTFOLIO STUDIO</span></div>
+    <div className="admin-login-mark"><img className="admin-login-favicon" src="/favicon-cropped.png" alt="" aria-hidden="true" /><span>PORTFOLIO STUDIO</span></div>
     <p className="admin-eyebrow">PRIVATE EDITOR</p>
     <h1>Welcome back.</h1>
     <p className="login-subtitle">Sign in to update your landing page, project images, and contact details.</p>
