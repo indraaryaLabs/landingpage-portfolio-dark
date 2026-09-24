@@ -25,6 +25,8 @@ The public copy is rendered from local data; Supabase is optional for displaying
 
 Set `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` in the hosting environment to enable the editor and public project images. Storage upload and table update policies must permit the authenticated owner. Never put a Supabase service-role key in `VITE_` variables. The old CMS files remain in the repository for reference, but only the project-image editor is routed. Do not run the legacy seed scripts: their starter records include unsupported sample claims.
 
+The public page keeps a local copy of the current portrait at `public/images/portrait.webp`. It displays that copy when the CMS or its Storage service is unavailable. The `Keep portfolio CMS active` GitHub Actions workflow makes small read requests every six hours using the `PORTFOLIO_SUPABASE_URL` and `PORTFOLIO_SUPABASE_ANON_KEY` repository secrets. This can help a Free Plan project avoid inactivity pausing, but Supabase only guarantees no inactivity pausing on a paid plan. GitHub may also disable scheduled workflows in a public repository after 60 days without repository activity; check that the workflow remains enabled.
+
 ## Stack
 
 React, Vite, CSS, self-hosted Manrope and Instrument Serif fonts, Lucide, and Supabase for project-image editing.

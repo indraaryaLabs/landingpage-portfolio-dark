@@ -1,0 +1,31 @@
+name: Keep portfolio CMS active
+
+on:
+  schedule:
+    - cron: '17 1,7,13,19 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  query-cms:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Read public CMS settings and projects
+        env:
+          SUPABASE_URL: ${{ secrets.PORTFOLIO_SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.PORTFOLIO_SUPABASE_ANON_KEY }}
+        run: |
+          if [ -z "$SUPABASE_URL" ] || [ -z "$SUPABASE_ANON_KEY" ]; then
+            echo 'Portfolio Supabase secrets are missing.' >&2
+            exit 1
+          fi
+
+          for table in site_settings projects; do
+            curl --fail-with-body --silent --show-error --retry 2 --max-time 20 \
+              --header "apikey: $SUPABASE_ANON_KEY" \
+              --header "Authorization: Bearer $SUPABASE_ANON_KEY" \
+              "$SUPABASE_URL/rest/v1/$table?select=id&limit=1" > /dev/null
+          done

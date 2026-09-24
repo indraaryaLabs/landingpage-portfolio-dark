@@ -19,8 +19,8 @@ export const defaultPortfolioContent = {
     description: 'My freelance work on PickFrame covered Go APIs, PostgreSQL, and React. I’m based in Indonesia and open to junior roles across the country.',
     linkLabel: 'View live product',
     linkUrl: 'https://pickframe.satuarah.click',
-    portraitUrl: templateMedia.portrait,
-    portraitAlt: 'Temporary portrait from the supplied portfolio template; not a photo of Indra',
+    portraitUrl: '',
+    portraitAlt: 'Portfolio profile image',
     reelUrl: templateMedia.reel,
   },
   work: {
