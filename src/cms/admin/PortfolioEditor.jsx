@@ -25,11 +25,12 @@ function Field({ label, value, onChange, hint, multiline = false, type = 'text',
   </div>;
 }
 
-function ImageSlot({ label, description, value, defaultUrl, onChange, aspect, onUploadingChange, isTemplate }) {
+function ImageSlot({ label, description, value, defaultUrl, onChange, aspect, onUploadingChange, isTemplate, altLabel, altValue, onAltChange }) {
   return <div className="admin-media-slot">
     <div className="admin-media-intro"><div className="admin-media-icon"><ImageIcon size={20} strokeWidth={1.6} /></div><div><h3>{label}</h3><p>{description}</p></div></div>
     <ImageUpload label="Image file" value={value || defaultUrl} onChange={(next) => onChange(next || defaultUrl)} canRemove={!isTemplate} aspect={aspect} optimized onUploadingChange={onUploadingChange} />
     <p className="admin-hint">{isTemplate ? 'Currently using the original template artwork. Upload your own image, then Save to publish.' : 'Custom image selected. Save to publish any changes.'}</p>
+    <Field label={altLabel} value={altValue} onChange={onAltChange} hint="A neutral description is added on upload. Edit it to describe the actual image more precisely." required={!isTemplate} />
   </div>;
 }
 
@@ -129,12 +130,12 @@ export default function PortfolioEditor() {
   }
 
   function updatePortrait(value) {
-    setContent((current) => ({ ...current, hero: { ...current.hero, portraitUrl: value, portraitAlt: value === templateMedia.portrait || !value ? defaultPortfolioContent.hero.portraitAlt : '' } }));
+    setContent((current) => ({ ...current, hero: { ...current.hero, portraitUrl: value, portraitAlt: value === templateMedia.portrait || !value ? defaultPortfolioContent.hero.portraitAlt : 'Portfolio profile image' } }));
     setDirty(true);
   }
 
   function updateCardImage(slot, index, value) {
-    setContent((current) => ({ ...current, work: { ...current.work, cards: current.work.cards.map((card) => card.slot === slot ? { ...card, imageUrl: value, imageAlt: value === templateMedia.projects[index] || !value ? defaultPortfolioContent.work.cards[index].imageAlt : '' } : card) } }));
+    setContent((current) => ({ ...current, work: { ...current.work, cards: current.work.cards.map((card) => card.slot === slot ? { ...card, imageUrl: value, imageAlt: value === templateMedia.projects[index] || !value ? defaultPortfolioContent.work.cards[index].imageAlt : `Visual for ${card.name}` } : card) } }));
     setDirty(true);
   }
 
@@ -208,13 +209,12 @@ export default function PortfolioEditor() {
     {section === 'hero' && <div className="admin-section-stack">
       <div className="admin-panel"><p className="admin-panel-index">HEADER</p><h2>Navigation</h2><div className="admin-editor-grid"><Field label="Wordmark" value={content.header.brand} onChange={(value) => updatePart('header', 'brand', value)} required /><Field label="Work link label" value={content.header.workLabel} onChange={(value) => updatePart('header', 'workLabel', value)} /><Field label="About link label" value={content.header.aboutLabel} onChange={(value) => updatePart('header', 'aboutLabel', value)} /></div></div>
       <div className="admin-panel"><p className="admin-panel-index">HERO</p><h2>Introduction</h2><div className="admin-editor-grid"><Field label="Main heading" value={content.hero.heading} onChange={(value) => updatePart('hero', 'heading', value)} multiline rows={2} hint="A line break in this field becomes a line break on the landing page." required /><Field label="Lead sentence" value={content.hero.lead} onChange={(value) => updatePart('hero', 'lead', value)} multiline rows={3} required /><Field label="Supporting paragraph" value={content.hero.description} onChange={(value) => updatePart('hero', 'description', value)} multiline rows={4} /><Field label="Link label" value={content.hero.linkLabel} onChange={(value) => updatePart('hero', 'linkLabel', value)} /><Field label="Link URL" value={content.hero.linkUrl} onChange={(value) => updatePart('hero', 'linkUrl', value)} type="url" /></div></div>
-      <div className="admin-editor-grid admin-media-grid"><ImageSlot label="Hero portrait" description="Circular image at the beginning of the page. Square crop recommended." value={content.hero.portraitUrl} defaultUrl={templateMedia.portrait} onChange={updatePortrait} aspect="1/1" onUploadingChange={onUploadingChange} isTemplate={!content.hero.portraitUrl || content.hero.portraitUrl === templateMedia.portrait} /><VideoSlot value={content.hero.reelUrl} onChange={(value) => updatePart('hero', 'reelUrl', value)} onUploadingChange={onUploadingChange} /></div>
-      <div className="admin-panel"><Field label="Portrait alternative text" value={content.hero.portraitAlt} onChange={(value) => updatePart('hero', 'portraitAlt', value)} hint="Describe the actual uploaded image. The template portrait is never described as your photo." /></div>
+      <div className="admin-editor-grid admin-media-grid"><ImageSlot label="Hero portrait" description="Circular image at the beginning of the page. Square crop recommended." value={content.hero.portraitUrl} defaultUrl={templateMedia.portrait} onChange={updatePortrait} aspect="1/1" onUploadingChange={onUploadingChange} isTemplate={!content.hero.portraitUrl || content.hero.portraitUrl === templateMedia.portrait} altLabel="Portrait alternative text" altValue={content.hero.portraitAlt} onAltChange={(value) => updatePart('hero', 'portraitAlt', value)} /><VideoSlot value={content.hero.reelUrl} onChange={(value) => updatePart('hero', 'reelUrl', value)} onUploadingChange={onUploadingChange} /></div>
     </div>}
 
     {section === 'work' && <div className="admin-section-stack">
       <div className="admin-panel"><p className="admin-panel-index">FEATURED WORK</p><h2>Section title</h2><div className="admin-editor-grid"><Field label="Heading" value={content.work.heading} onChange={(value) => updatePart('work', 'heading', value)} required /><Field label="Scroll cue" value={content.work.scrollLabel} onChange={(value) => updatePart('work', 'scrollLabel', value)} /></div></div>
-      {content.work.cards.map((card, index) => <div className="admin-panel" key={card.slot}><p className="admin-panel-index">PROJECT 0{index + 1}</p><h2>{card.name || `Project ${index + 1}`}</h2><div className="admin-project-layout"><ImageSlot label={`Project ${index + 1} image`} description="Actual project screenshot recommended. Cropped to the card's landscape frame." value={card.imageUrl} defaultUrl={templateMedia.projects[index]} onChange={(value) => updateCardImage(card.slot, index, value)} aspect="450/310" onUploadingChange={onUploadingChange} isTemplate={!card.imageUrl || card.imageUrl === templateMedia.projects[index]} /><div className="admin-project-fields"><Field label={`Project ${index + 1} name`} value={card.name} onChange={(value) => updateCard(card.slot, 'name', value)} required /><Field label={`Project ${index + 1} category`} value={card.category} onChange={(value) => updateCard(card.slot, 'category', value)} /><Field label={`Project ${index + 1} summary`} value={card.summary} onChange={(value) => updateCard(card.slot, 'summary', value)} multiline rows={4} /><Field label={`Project ${index + 1} URL`} value={card.link} onChange={(value) => updateCard(card.slot, 'link', value)} type="url" required /><Field label={`Project ${index + 1} image alt text`} value={card.imageAlt} onChange={(value) => updateCard(card.slot, 'imageAlt', value)} /></div></div></div>)}
+      {content.work.cards.map((card, index) => <div className="admin-panel" key={card.slot}><p className="admin-panel-index">PROJECT 0{index + 1}</p><h2>{card.name || `Project ${index + 1}`}</h2><div className="admin-project-layout"><ImageSlot label={`Project ${index + 1} image`} description="Actual project screenshot recommended. Cropped to the card's landscape frame." value={card.imageUrl} defaultUrl={templateMedia.projects[index]} onChange={(value) => updateCardImage(card.slot, index, value)} aspect="450/310" onUploadingChange={onUploadingChange} isTemplate={!card.imageUrl || card.imageUrl === templateMedia.projects[index]} altLabel={`Project ${index + 1} image alt text`} altValue={card.imageAlt} onAltChange={(value) => updateCard(card.slot, 'imageAlt', value)} /><div className="admin-project-fields"><Field label={`Project ${index + 1} name`} value={card.name} onChange={(value) => updateCard(card.slot, 'name', value)} required /><Field label={`Project ${index + 1} category`} value={card.category} onChange={(value) => updateCard(card.slot, 'category', value)} /><Field label={`Project ${index + 1} summary`} value={card.summary} onChange={(value) => updateCard(card.slot, 'summary', value)} multiline rows={4} /><Field label={`Project ${index + 1} URL`} value={card.link} onChange={(value) => updateCard(card.slot, 'link', value)} type="url" required /></div></div></div>)}
     </div>}
 
     {section === 'about' && <div className="admin-section-stack">

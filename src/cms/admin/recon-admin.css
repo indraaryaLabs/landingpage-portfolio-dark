@@ -28,6 +28,7 @@
 .admin-sidebar { background: #fff; border-right: 1px solid var(--admin-border); box-shadow: none; }
 .admin-sidebar-brand { min-height: 105px; padding: 23px 25px; gap: 12px; color: #0e0e0e; border-bottom: 1px solid var(--admin-border); font-size: 17px; font-weight: 760; line-height: 1.05; }
 .admin-sidebar-brand .brand-dot { width: 43px; height: 43px; border-radius: 50%; background: #0e0e0e; color: #fff; font-size: 15px; letter-spacing: -.08em; }
+.admin-sidebar-brand .brand-dot img { display: block; width: 34px; height: 34px; object-fit: contain; }
 .admin-sidebar-brand small { display: block; margin-top: 5px; font-size: 9px; font-weight: 680; letter-spacing: .14em; }
 .admin-sidebar-caption { padding: 35px 25px 13px; color: #73736e; font-size: 10px; font-weight: 700; letter-spacing: .14em; }
 .admin-sidebar-nav { padding: 0 12px; gap: 2px; }
@@ -135,6 +136,7 @@
 .admin-login-page { background: #f6f6f4; }
 .admin-login-card { max-width: 490px; padding: 45px; background: #fff; border: 1px solid #dededb; border-radius: 0; box-shadow: none; }
 .admin-login-mark { display: flex; align-items: center; gap: 12px; margin-bottom: 65px; font-size: 23px; font-weight: 750; letter-spacing: -.08em; }
+.admin-login-favicon { display: block; width: 44px; height: 44px; padding: 5px; border-radius: 50%; background: #0e0e0e; object-fit: contain; }
 .admin-login-mark span { padding-left: 12px; border-left: 1px solid #aaa; font-size: 11px; font-weight: 750; letter-spacing: .13em; }
 .admin-login-card h1 { margin: 0 0 12px; color: #0e0e0e; font-size: 48px; font-weight: 490; letter-spacing: -.04em; line-height: 1; }
 .admin-login-card .login-subtitle { color: #555; }

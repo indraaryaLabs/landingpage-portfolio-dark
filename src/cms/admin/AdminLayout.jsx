@@ -28,7 +28,7 @@ export default function AdminLayout() {
   return <ToastProvider><div className="admin-root">
     {sidebarOpen && <button type="button" className="admin-sidebar-backdrop" onClick={() => setSidebarOpen(false)} aria-label="Close section menu" />}
     <aside className={`admin-sidebar ${sidebarOpen ? 'open' : ''}`} aria-label="Portfolio editor sections">
-      <Link className="admin-sidebar-brand" to="/admin" onClick={() => setSidebarOpen(false)}><span className="brand-dot">IA</span><span>INDRA ARYA<small>PORTFOLIO STUDIO</small></span></Link>
+      <Link className="admin-sidebar-brand" to="/admin" onClick={() => setSidebarOpen(false)}><span className="brand-dot"><img src="/favicon-cropped.png" alt="" aria-hidden="true" /></span><span>INDRA ARYA<small>PORTFOLIO STUDIO</small></span></Link>
       <div className="admin-sidebar-caption">EDIT THE LANDING PAGE</div>
       <nav className="admin-sidebar-nav" aria-label="Editor navigation">
         {NAV_ITEMS.map((item) => <Link key={item.section} to={item.section === 'overview' ? '/admin' : `/admin#${item.section}`} className={`admin-nav-item ${activeSection === item.section ? 'active' : ''}`} aria-current={activeSection === item.section ? 'page' : undefined} onClick={() => setSidebarOpen(false)}><span className="admin-nav-number">{item.number}</span><span>{item.label}</span><span className="admin-nav-arrow">↗</span></Link>)}
