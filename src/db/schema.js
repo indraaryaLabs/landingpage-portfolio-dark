@@ -1,4 +1,4 @@
-import { pgTable, serial, text, varchar, timestamp, integer, boolean, numeric } from 'drizzle-orm/pg-core';
+import { pgTable, serial, text, varchar, timestamp, integer, boolean, numeric, jsonb } from 'drizzle-orm/pg-core';
 
 // ============================================
 // Site Settings — Hero content & global config
@@ -19,6 +19,7 @@ export const siteSettings = pgTable('site_settings', {
   socialInstagram: text('social_instagram'),
   socialFacebook: text('social_facebook'),
   socialWebsite: text('social_website'),
+  portfolioContent: jsonb('portfolio_content').notNull().default({}),
   updatedAt: timestamp('updated_at').defaultNow(),
 });
 

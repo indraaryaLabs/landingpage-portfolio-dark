@@ -3,7 +3,7 @@ export const profile = {
   email: 'contact.indraarya@gmail.com',
   github: 'https://github.com/indraaryaLabs',
   linkedin: 'https://www.linkedin.com/in/indraaryaslametpraditya/',
-  location: 'Kendari, Indonesia',
+  location: 'Indonesia',
 };
 
 export const experience = [
