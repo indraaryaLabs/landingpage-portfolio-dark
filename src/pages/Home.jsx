@@ -34,8 +34,19 @@ function WorkCard({ project, index }) {
   </article>;
 }
 
+function HomePlaceholder() {
+  return <div className="recon-site recon-loading" role="status" aria-label="Loading portfolio">
+    <span className="recon-loading-label">Loading portfolio…</span>
+    <div aria-hidden="true">
+      <div className="recon-loading-nav"><span className="recon-loading-block recon-loading-brand" /><span className="recon-loading-block recon-loading-nav-links" /><span className="recon-loading-block recon-loading-contact" /></div>
+      <div className="recon-loading-hero"><span className="recon-loading-block recon-loading-portrait" /><div className="recon-loading-copy"><span className="recon-loading-block recon-loading-heading" /><span className="recon-loading-block recon-loading-heading recon-loading-heading-short" /><span className="recon-loading-block recon-loading-line" /><span className="recon-loading-block recon-loading-line recon-loading-line-short" /></div></div>
+      <div className="recon-loading-reel" />
+    </div>
+  </div>;
+}
+
 export default function Home() {
-  const [content, setContent] = useState(defaultPortfolioContent);
+  const [content, setContent] = useState(() => import.meta.env.VITE_SUPABASE_URL && import.meta.env.VITE_SUPABASE_ANON_KEY ? null : defaultPortfolioContent);
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -50,11 +61,17 @@ export default function Home() {
     let cancelled = false;
     import('../lib/supabaseApi').then(async ({ getSiteSettings, getProjects }) => {
       const [settings, legacy] = await Promise.allSettled([getSiteSettings(), getProjects()]);
-      if (cancelled || (settings.status !== 'fulfilled' && legacy.status !== 'fulfilled')) return;
+      if (cancelled) return;
+      if (settings.status !== 'fulfilled' && legacy.status !== 'fulfilled') {
+        setContent(defaultPortfolioContent);
+        return;
+      }
       setContent(normalizePortfolioContent(settings.status === 'fulfilled' ? settings.value?.portfolio_content : {}, legacy.status === 'fulfilled' ? legacy.value : []));
-    }).catch(() => { /* Keep verified defaults when the CMS is unavailable. */ });
+    }).catch(() => { if (!cancelled) setContent(defaultPortfolioContent); });
     return () => { cancelled = true; };
   }, []);
+
+  if (!content) return <HomePlaceholder />;
 
   const portrait = safeWebUrl(content.hero.portraitUrl) || templateMedia.portrait;
   const reel = safeWebUrl(content.hero.reelUrl) || templateMedia.reel;
