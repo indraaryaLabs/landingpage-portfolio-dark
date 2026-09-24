@@ -1,108 +1,74 @@
 import { useEffect, useState } from 'react';
-import { ArrowDown, ArrowUpRight, Mail } from 'lucide-react';
-import { experience, profile, projects, skillGroups } from '../data/portfolio';
+import { defaultPortfolioContent, normalizePortfolioContent, safeWebUrl, templateMedia } from '../data/portfolioContent';
+import '@fontsource-variable/inter-tight/wght.css';
 import './portfolio.css';
 
-function ExternalLink({ href, children, className = '', ...props }) {
-  return <a className={className} href={href} target="_blank" rel="noopener noreferrer" {...props}>{children}</a>;
+function EmailButton({ email, compact = false }) {
+  const [copied, setCopied] = useState(false);
+
+  async function copyEmail() {
+    try {
+      await navigator.clipboard.writeText(email);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 2500);
+    } catch {
+      window.location.href = `mailto:${email}`;
+    }
+  }
+
+  return <button type="button" className={`recon-email${compact ? ' recon-email-compact' : ''}`} onClick={copyEmail} aria-label={copied ? 'Email address copied' : `Copy email address ${email}`}>
+    <span>{copied ? 'EMAIL COPIED!' : email}</span>
+    <svg viewBox="0 0 20 20" width="16" height="16" fill="none" aria-hidden="true"><rect x="7" y="7" width="9" height="10" rx="1" stroke="currentColor" strokeWidth="1.4" /><path d="M13 7V4.5A1.5 1.5 0 0 0 11.5 3h-7A1.5 1.5 0 0 0 3 4.5v8A1.5 1.5 0 0 0 4.5 14H7" stroke="currentColor" strokeWidth="1.4" /></svg>
+  </button>;
 }
 
-function SectionHeading({ number, title, note }) {
-  return <div className="pf-section-heading">
-    <div className="pf-section-index">{number} / {note}</div>
-    <h2>{title}</h2>
-  </div>;
+function WorkCard({ project, index }) {
+  const image = safeWebUrl(project.imageUrl) || templateMedia.projects[index];
+  const isTemplate = image === templateMedia.projects[index];
+  const link = safeWebUrl(project.link) || defaultPortfolioContent.work.cards[index].link;
+  return <article className={`recon-work-card recon-work-card-${index + 1}`}>
+    <a href={link} target="_blank" rel="noopener noreferrer" aria-label={`View ${project.name}. ${project.summary}${isTemplate ? ' Image is temporary template artwork.' : ''}`}>
+      <div className="recon-work-image"><img src={image} alt={isTemplate ? 'Temporary artwork from the supplied portfolio template' : project.imageAlt || `${project.name} project image`} loading="lazy" decoding="async" width="450" height="310" /><div className="recon-work-overlay"><span>{project.category}</span><p>{project.summary}</p>{isTemplate && <small>Template artwork · project image to be replaced</small>}</div></div>
+      <div className="recon-work-caption"><strong>{project.name} <span aria-hidden="true">↗</span></strong></div>
+    </a>
+  </article>;
 }
 
 export default function Home() {
-  const [projectImages, setProjectImages] = useState({});
+  const [content, setContent] = useState(defaultPortfolioContent);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const syncScroll = () => setScrolled(window.scrollY > 16);
+    syncScroll();
+    window.addEventListener('scroll', syncScroll, { passive: true });
+    return () => window.removeEventListener('scroll', syncScroll);
+  }, []);
 
   useEffect(() => {
     if (!import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_ANON_KEY) return;
-    const section = document.getElementById('projects');
-    if (!section) return;
     let cancelled = false;
-    const observer = new IntersectionObserver((entries) => {
-      if (!entries.some(entry => entry.isIntersecting)) return;
-      observer.disconnect();
-      import('../lib/supabaseApi').then(({ getProjects }) => getProjects()).then(rows => {
-        if (cancelled) return;
-        const images = {};
-        for (const project of projects) {
-          const row = rows.find(item => Number(item.slot_number) === project.slot && item.project_link?.replace(/\/$/, '') === project.link);
-          if (row?.image_url) images[project.slot] = row.image_url;
-        }
-        setProjectImages(images);
-      }).catch(() => { /* CSS project artwork remains available when CMS is offline. */ });
-    }, { rootMargin: '400px' });
-    observer.observe(section);
-    return () => { cancelled = true; observer.disconnect(); };
+    import('../lib/supabaseApi').then(async ({ getSiteSettings, getProjects }) => {
+      const [settings, legacy] = await Promise.allSettled([getSiteSettings(), getProjects()]);
+      if (cancelled || (settings.status !== 'fulfilled' && legacy.status !== 'fulfilled')) return;
+      setContent(normalizePortfolioContent(settings.status === 'fulfilled' ? settings.value?.portfolio_content : {}, legacy.status === 'fulfilled' ? legacy.value : []));
+    }).catch(() => { /* Keep verified defaults when the CMS is unavailable. */ });
+    return () => { cancelled = true; };
   }, []);
 
-  return <div className="portfolio">
-    <div className="pf-grain" aria-hidden="true" />
-    <header className="pf-header">
-      <a className="pf-mark" href="#top" aria-label="Back to top">IA<span>.</span></a>
-      <nav aria-label="Main navigation">
-        <a href="#work">Work</a><a href="#projects">Projects</a><a href="#about">About</a>
-      </nav>
-      <a className="pf-header-contact" href={`mailto:${profile.email}`}>Get in touch <ArrowUpRight size={16} /></a>
-    </header>
+  const portrait = safeWebUrl(content.hero.portraitUrl) || templateMedia.portrait;
+  const reel = safeWebUrl(content.hero.reelUrl) || templateMedia.reel;
+  const heroLink = safeWebUrl(content.hero.linkUrl) || defaultPortfolioContent.hero.linkUrl;
+  const anyTemplateImages = content.work.cards.some((card, index) => (safeWebUrl(card.imageUrl) || templateMedia.projects[index]) === templateMedia.projects[index]);
 
-    <main id="top">
-      <section className="pf-hero" aria-labelledby="pf-title">
-        <div className="pf-hero-topline"><span className="pf-availability"><span className="pf-dot" /> Available immediately</span><span>{profile.location} · Open to relocation</span></div>
-        <div className="pf-hero-main">
-          <div>
-            <p className="pf-eyebrow">INDRA ARYA / SOFTWARE ENGINEER</p>
-            <h1 id="pf-title">Software for<br /><em>real workflows.</em></h1>
-            <p className="pf-hero-copy">I'm Indra, a junior software engineer. My freelance work on PickFrame spans Go APIs, PostgreSQL/Supabase and React. The projects below show how I approach mobile apps, service visibility and data processing.</p>
-            <div className="pf-actions">
-              <ExternalLink className="pf-button pf-button-primary" href="https://pickframe.satuarah.click">Explore live product <ArrowUpRight size={17} /></ExternalLink>
-              <a className="pf-button pf-button-ghost" href="#projects">View selected projects <ArrowDown size={17} /></a>
-            </div>
-          </div>
-          <div className="pf-hero-aside" aria-label="Professional focus">
-            <div className="pf-orbit" aria-hidden="true"><span>IA</span></div>
-            <p>ENGINEERING WITH CONTEXT<br />PRODUCT · SYSTEMS · DATA</p>
-          </div>
-        </div>
-        <div className="pf-hero-bottom"><span>SELECTED WORK / 2025—2026</span><a href="#work">SCROLL TO EXPLORE <ArrowDown size={14} /></a></div>
-      </section>
-
-      <section className="pf-section pf-work" id="work">
-        <SectionHeading number="01" note="EXPERIENCE" title={<>Real work.<br /><em>Clear scope.</em></>} />
-        <div className="pf-work-list">{experience.map((item) => <article className="pf-work-item" key={item.company}>
-          <div className="pf-work-meta"><span>{item.period}</span><span>{item.location}</span></div>
-          <div><p className="pf-work-role">{item.role}</p><h3>{item.company}</h3><p className="pf-work-desc">{item.description}</p>
-          {item.link && <ExternalLink href={item.link} className="pf-text-link">View product <ArrowUpRight size={15} /></ExternalLink>}</div>
-        </article>)}</div>
-      </section>
-
-      <section className="pf-section pf-projects" id="projects">
-        <SectionHeading number="02" note="SELECTED PROJECTS" title={<>Evidence over<br /><em>adjectives.</em></>} />
-        <p className="pf-section-intro">Three public repositories that show how I approach mobile product flows, system visibility and data processing.</p>
-        <div className="pf-project-grid">{projects.map((item) => <article className="pf-project" key={item.name}>
-          <div className={`pf-project-art pf-art-${item.art}`} aria-hidden={!projectImages[item.slot]}>
-            {projectImages[item.slot] ? <img className="pf-project-image" src={projectImages[item.slot]} alt={`${item.name} project screenshot`} width="800" height="450" loading="lazy" decoding="async" /> : null}
-            {!projectImages[item.slot] && item.art === 'mobile' && <div className="pf-phone"><div className="pf-phone-bar" /><div className="pf-phone-title">Jejak Karier</div><div className="pf-phone-stat"><b>Applications</b><span>Track your next step</span></div><div className="pf-phone-row" /><div className="pf-phone-row short" /><div className="pf-phone-row" /></div>}
-            {!projectImages[item.slot] && item.art === 'systems' && <div className="pf-system"><div className="pf-system-top">SERVICE STATUS <span>● LIVE</span></div><div className="pf-system-chart"><i /><i /><i /><i /><i /><i /><i /><i /><i /><i /></div><div className="pf-system-line"/><div className="pf-system-line short"/></div>}
-            {!projectImages[item.slot] && item.art === 'data' && <div className="pf-data-visual"><span>EXTRACT</span><b>→</b><span>TRANSFORM</span><b>→</b><span>EXPORT</span><div className="pf-data-grid" /></div>}
-          </div>
-          <div className="pf-project-head"><span>{item.number} / {item.category}</span><ExternalLink href={item.link} className="pf-project-arrow" aria-label={`Open ${item.name} repository`}><ArrowUpRight size={20} /></ExternalLink></div>
-          <h3>{item.name}</h3><p>{item.summary}</p><div className="pf-tags">{item.stack.map(tag => <span key={tag}>{tag}</span>)}</div>
-          <ExternalLink href={item.link} className="pf-text-link">View repository <ArrowUpRight size={15} /></ExternalLink>
-        </article>)}</div>
-      </section>
-
-      <section className="pf-section pf-about" id="about">
-        <SectionHeading number="03" note="ABOUT & SKILLS" title={<>Curious by default.<br /><em>Grounded in delivery.</em></>} />
-        <div className="pf-about-grid"><div><p className="pf-about-lead">I am an Informatics graduate from UIN Sunan Kalijaga Yogyakarta (2025, GPA 3.54/4.00).</p><p>My strongest evidence is a freelance full-stack product and hands-on projects across mobile, backend, system monitoring and data pipelines. I am currently seeking an entry-level software engineering role and am open to relocation across Indonesia.</p><div className="pf-education"><span>EDUCATION</span><strong>Bachelor of Informatics (S.Kom)</strong><span>UIN Sunan Kalijaga Yogyakarta · 2021–2025</span></div></div>
-          <div className="pf-skills">{skillGroups.map(group => <div className="pf-skill-row" key={group.title}><h3>{group.title}</h3><p>{group.items}</p></div>)}</div></div>
-      </section>
-
-      <section className="pf-contact" id="contact"><div className="pf-contact-top"><span>04 / LET'S CONNECT</span><span>KENDARI · INDONESIA</span></div><h2>Have a role<br /><em>in mind?</em></h2><p>Open to junior software engineering and related IT opportunities.</p><a className="pf-contact-link" href={`mailto:${profile.email}`}>{profile.email}<ArrowUpRight size={30} /></a></section>
+  return <div className="recon-site" id="top">
+    <header className={`recon-nav${scrolled ? ' recon-nav-scrolled' : ''}`}><a className="recon-wordmark" href="#top">{content.header.brand}</a><nav aria-label="Main navigation"><a href="#work">{content.header.workLabel}</a><a href="#about">{content.header.aboutLabel}</a></nav><EmailButton email={content.footer.email} compact /></header>
+    <main>
+      <section className="recon-hero" aria-labelledby="hero-title"><div className="recon-hero-inner"><div className="recon-portrait"><img src={portrait} alt={portrait === templateMedia.portrait ? defaultPortfolioContent.hero.portraitAlt : content.hero.portraitAlt || 'Portrait'} width="350" height="350" fetchPriority="high" /></div><div className="recon-hero-copy"><h1 id="hero-title">{content.hero.heading}</h1><p>{content.hero.lead}</p><p>{content.hero.description}</p><a className="recon-hero-link" href={heroLink} target="_blank" rel="noopener noreferrer">{content.hero.linkLabel} <span aria-hidden="true">↗</span></a></div></div></section>
+      <div className="recon-reel" aria-hidden="true"><video src={reel} autoPlay muted loop playsInline preload="metadata" /></div>
+      <section className="recon-work" id="work" aria-labelledby="work-title"><div className="recon-work-title"><h2 id="work-title">{content.work.heading}</h2><p>{content.work.scrollLabel}</p></div>{content.work.cards.map((project, index) => <WorkCard key={project.slot} project={project} index={index} />)}</section>
+      <section className="recon-about" id="about" aria-labelledby="about-title"><h2 id="about-title">{content.about.heading}</h2><div className="recon-about-intro"><h3>{content.about.headline}</h3><div>{content.about.paragraphs.map((paragraph, index) => <p key={index}>{paragraph}</p>)}</div></div><div className="recon-timeline">{content.about.timeline.map((item, index) => <article className="recon-timeline-row" key={item.id || index}><p>{item.period}</p><div><h3>{item.title}</h3><strong>{item.subtitle}</strong><p>{item.description}</p>{safeWebUrl(item.linkUrl) && <a href={safeWebUrl(item.linkUrl)} target="_blank" rel="noopener noreferrer">{item.linkLabel || 'View link'} ↗</a>}</div></article>)}</div>{anyTemplateImages && <p className="recon-visual-note">{content.about.imageNote}</p>}</section>
     </main>
-    <footer className="pf-footer"><span>© {new Date().getFullYear()} {profile.name}</span><div><ExternalLink href={profile.github}>GitHub <ArrowUpRight size={15} /></ExternalLink><ExternalLink href={profile.linkedin}>LinkedIn <ArrowUpRight size={15} /></ExternalLink><a href={`mailto:${profile.email}`}>Email <Mail size={15} /></a></div><a href="#top">Back to top ↑</a></footer>
+    <footer className="recon-footer"><h2>{content.footer.heading}</h2><EmailButton email={content.footer.email} compact /><div className="recon-footer-bottom"><div>{safeWebUrl(content.footer.githubUrl) && <a href={safeWebUrl(content.footer.githubUrl)} target="_blank" rel="noopener noreferrer" aria-label="GitHub">{content.footer.githubLabel}</a>}{safeWebUrl(content.footer.linkedinUrl) && <a href={safeWebUrl(content.footer.linkedinUrl)} target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">{content.footer.linkedinLabel}</a>}{safeWebUrl(content.footer.instagramUrl) && <a href={safeWebUrl(content.footer.instagramUrl)} target="_blank" rel="noopener noreferrer" aria-label="Instagram">{content.footer.instagramLabel}</a>}</div><span>© {new Date().getFullYear()} {content.footer.copyrightName}</span></div></footer>
   </div>;
 }

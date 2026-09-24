@@ -569,6 +569,7 @@ export function ImageCropperModal({ src, filename, filetype, defaultAspect = '22
   // Predefined Aspect Ratio options
   const AR_PRESETS = [
     { id: '22/15', label: 'Marquee Card (22:15)' },
+    { id: '450/310', label: 'Project image (45:31)' },
     { id: '1/1', label: '1:1 Square' },
     { id: '4/3', label: '4:3 Classic' },
     { id: '16/9', label: '16:9 Cinema' },
@@ -579,29 +580,29 @@ export function ImageCropperModal({ src, filename, filetype, defaultAspect = '22
     <div style={{
       position: 'fixed',
       inset: 0,
-      background: 'rgba(5, 5, 5, 0.85)',
-      backdropFilter: 'blur(16px)',
-      WebkitBackdropFilter: 'blur(16px)',
+      background: 'rgba(14, 14, 14, 0.55)',
+      backdropFilter: 'blur(8px)',
+      WebkitBackdropFilter: 'blur(8px)',
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
       justifyContent: 'center',
       zIndex: 9999,
-      padding: '24px',
-      color: '#fff',
+      padding: '16px',
+      color: '#0e0e0e',
       animation: 'fadeIn 0.2s ease'
     }}>
       {/* Modal Card */}
       <div style={{
-        background: '#09090b',
-        border: '1px solid rgba(255,255,255,0.08)',
-        borderRadius: '20px',
+        background: '#fff',
+        border: '1px solid #dededb',
+        borderRadius: '2px',
         width: '100%',
-        maxW: '800px',
         maxWidth: '800px',
+        maxHeight: 'calc(100vh - 32px)',
         display: 'flex',
         flexDirection: 'column',
-        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.7)',
+        boxShadow: '0 24px 70px rgba(0, 0, 0, 0.2)',
         overflow: 'hidden'
       }}>
         {/* Header */}
@@ -610,19 +611,20 @@ export function ImageCropperModal({ src, filename, filetype, defaultAspect = '22
           alignItems: 'center',
           justifyContent: 'space-between',
           padding: '16px 24px',
-          borderBottom: '1px solid rgba(255,255,255,0.06)'
+          borderBottom: '1px solid #dededb'
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Scissors size={18} color="#a1a1aa" />
-            <h3 style={{ fontSize: '16px', fontWeight: 700, margin: 0, letterSpacing: '-0.02em' }}>Visual Image Cropper</h3>
+            <Scissors size={18} color="#5f5f5d" />
+            <h3 style={{ fontSize: '16px', fontWeight: 650, margin: 0, letterSpacing: '-0.02em' }}>Crop image</h3>
           </div>
           <button
             type="button"
             onClick={onCancel}
+            aria-label="Close image cropper"
             style={{
               background: 'transparent',
               border: 'none',
-              color: '#a1a1aa',
+              color: '#5f5f5d',
               cursor: 'pointer',
               padding: '4px'
             }}
@@ -636,8 +638,8 @@ export function ImageCropperModal({ src, filename, filetype, defaultAspect = '22
           display: 'flex',
           gap: '8px',
           padding: '12px 24px',
-          background: 'rgba(255,255,255,0.01)',
-          borderBottom: '1px solid rgba(255,255,255,0.04)',
+          background: '#fff',
+          borderBottom: '1px solid #dededb',
           overflowX: 'auto'
         }}>
           {AR_PRESETS.map((preset) => (
@@ -647,10 +649,10 @@ export function ImageCropperModal({ src, filename, filetype, defaultAspect = '22
               onClick={() => setAspectRatio(preset.id)}
               style={{
                 padding: '6px 12px',
-                borderRadius: '6px',
+                borderRadius: '999px',
                 border: 'none',
-                background: aspectRatio === preset.id ? 'rgba(255,255,255,0.1)' : 'transparent',
-                color: aspectRatio === preset.id ? '#ffffff' : '#71717a',
+                background: aspectRatio === preset.id ? '#0e0e0e' : '#f3f3f1',
+                color: aspectRatio === preset.id ? '#fff' : '#555',
                 fontSize: '12px',
                 fontWeight: 600,
                 cursor: 'pointer',
@@ -669,9 +671,9 @@ export function ImageCropperModal({ src, filename, filetype, defaultAspect = '22
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          background: '#040404',
+          background: '#f0f0ee',
           minHeight: '320px',
-          maxHeight: '480px',
+          maxHeight: 'min(480px, 50vh)',
           overflow: 'hidden',
           position: 'relative'
         }} ref={containerRef}>
@@ -749,10 +751,12 @@ export function ImageCropperModal({ src, filename, filetype, defaultAspect = '22
           alignItems: 'center',
           justifyContent: 'space-between',
           padding: '16px 24px',
-          borderTop: '1px solid rgba(255,255,255,0.06)',
-          background: '#09090b'
+          borderTop: '1px solid #dededb',
+          background: '#fff',
+          flexWrap: 'wrap',
+          gap: '12px'
         }}>
-          <p style={{ fontSize: '11px', color: '#71717a', margin: 0, display: 'flex', alignItems: 'center', gap: '4px' }}>
+          <p style={{ fontSize: '11px', color: '#5f5f5d', margin: 0, display: 'flex', alignItems: 'center', gap: '4px' }}>
             <Grid size={12} /> Drag corners to crop. Box is locked to the aspect ratio.
           </p>
           <div style={{ display: 'flex', gap: '12px' }}>
@@ -776,13 +780,13 @@ export function ImageCropperModal({ src, filename, filetype, defaultAspect = '22
                 display: 'flex',
                 alignItems: 'center',
                 gap: '6px',
-                background: '#ffffff',
-                color: '#000000'
+                background: '#0e0e0e',
+                color: '#fff'
               }}
             >
               {cropping ? (
                 <>
-                  <div className="admin-spinner" style={{ borderLeftColor: '#000000' }} />
+                  <div className="admin-spinner" style={{ borderLeftColor: '#fff' }} />
                   Processing...
                 </>
               ) : (

@@ -8,7 +8,7 @@ const AdminApp = lazy(() => import('./cms/AdminApp'));
 export default function App() {
   return <BrowserRouter><Routes>
     <Route path="/" element={<Home />} />
-    <Route path="/project/:id" element={<Navigate to="/#projects" replace />} />
+    <Route path="/project/:id" element={<Navigate to="/#work" replace />} />
     <Route path="/admin/*" element={<Suspense fallback={<div className="admin-loading">Loading editor…</div>}><AdminApp /></Suspense>} />
     <Route path="*" element={<Navigate to="/" replace />} />
   </Routes></BrowserRouter>;

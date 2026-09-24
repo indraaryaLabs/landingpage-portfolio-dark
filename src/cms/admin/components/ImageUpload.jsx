@@ -3,7 +3,7 @@ import { Upload, Trash2, Image as ImageIcon } from 'lucide-react';
 import { uploadMedia } from '../../../lib/supabaseApi';
 import { ImageCropperModal } from './ImageCollectionUpload';
 
-export default function ImageUpload({ value, onChange, label, aspect = 'free', imagesOnly = false, optimized = false, onUploadingChange = () => {} }) {
+export default function ImageUpload({ value, onChange, label, aspect = 'free', optimized = false, canRemove = true, onUploadingChange = () => {} }) {
   const [uploading, setUploading] = useState(false);
   const [dragover, setDragover] = useState(false);
   const inputRef = useRef(null);
@@ -13,26 +13,10 @@ export default function ImageUpload({ value, onChange, label, aspect = 'free', i
   const [cropImageSrc, setCropImageSrc] = useState('');
   const [showCropModal, setShowCropModal] = useState(false);
 
-  // Direct upload for non-images (videos) or bypass
-  async function uploadDirectly(file) {
-    setUploading(true);
-    onUploadingChange(true);
-    try {
-      const publicUrl = await uploadMedia(file);
-      onChange(publicUrl);
-    } catch (err) {
-      console.error('Upload failed:', err);
-      alert('Upload failed: ' + err.message);
-    } finally {
-      setUploading(false);
-      onUploadingChange(false);
-    }
-  }
-
   function handleFileSelect(file) {
     if (!file) return;
-    if (imagesOnly && !file.type.startsWith('image/')) {
-      alert('Please select an image file.');
+    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+      alert('Please select a JPEG, PNG, or WebP image.');
       return;
     }
     if (file.size > 10 * 1024 * 1024) {
@@ -40,19 +24,13 @@ export default function ImageUpload({ value, onChange, label, aspect = 'free', i
       return;
     }
 
-    if (file.type.startsWith('image/')) {
-      // If it is an image, open the visual cropper modal
-      const reader = new FileReader();
-      reader.onload = () => {
-        setCropImageSrc(reader.result);
-        setCropFile(file);
-        setShowCropModal(true);
-      };
-      reader.readAsDataURL(file);
-    } else {
-      // Otherwise upload directly (e.g. video files)
-      uploadDirectly(file);
-    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      setCropImageSrc(reader.result);
+      setCropFile(file);
+      setShowCropModal(true);
+    };
+    reader.readAsDataURL(file);
   }
 
   async function handleCropCompleted(croppedBlob, originalName) {
@@ -113,23 +91,27 @@ export default function ImageUpload({ value, onChange, label, aspect = 'free', i
             >
               <Upload size={14} /> Replace
             </button>
-            <button
+            {canRemove && <button
               type="button"
               className="admin-btn admin-btn-danger admin-btn-sm"
               onClick={() => onChange('')}
               disabled={uploading}
             >
-              <Trash2 size={14} /> Remove
-            </button>
+              <Trash2 size={14} /> Restore template
+            </button>}
           </div>
         </div>
       ) : (
         <div
           className={`admin-upload-zone ${dragover ? 'dragover' : ''}`}
+          role="button"
+          tabIndex={0}
+          aria-label={`Upload ${label || 'image'}`}
           onDrop={onDrop}
           onDragOver={onDragOver}
           onDragLeave={onDragLeave}
           onClick={() => inputRef.current?.click()}
+          onKeyDown={(event) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); inputRef.current?.click(); } }}
         >
           {uploading ? (
             <>
@@ -150,7 +132,7 @@ export default function ImageUpload({ value, onChange, label, aspect = 'free', i
       <input
         ref={inputRef}
         type="file"
-        accept={imagesOnly ? 'image/*' : 'image/*,video/*'}
+        accept="image/jpeg,image/png,image/webp"
         onChange={onFileSelect}
         style={{ display: 'none' }}
       />

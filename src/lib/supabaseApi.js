@@ -399,6 +399,10 @@ export async function getUnreadMessageCount() {
 const STORAGE_BUCKET = 'portfolio-media';
 
 export async function uploadMedia(file) {
+  const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'video/mp4', 'video/webm'];
+  if (!allowedTypes.includes(file.type)) throw new Error('Unsupported media type. Use JPEG, PNG, WebP, MP4, or WebM.');
+  const maxBytes = file.type.startsWith('video/') ? 50 * 1024 * 1024 : 10 * 1024 * 1024;
+  if (file.size > maxBytes) throw new Error(`File exceeds the ${file.type.startsWith('video/') ? 50 : 10} MB limit.`);
   const fileExt = file.name.split('.').pop();
   const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 8)}.${fileExt}`;
   const filePath = `uploads/${fileName}`;

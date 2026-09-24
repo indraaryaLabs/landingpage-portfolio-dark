@@ -1,99 +1,43 @@
 import { useState } from 'react';
-import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { ArrowUpRight, LogOut, Menu, X } from 'lucide-react';
 import { useAuth } from '../AuthContext';
 import { ToastProvider } from './components/Toast';
-import { LayoutDashboard, FolderKanban, ExternalLink, LogOut, Menu, X } from 'lucide-react';
 import '../admin.css';
 
 const NAV_ITEMS = [
-  { label: 'Overview', to: '/admin', icon: LayoutDashboard, end: true },
-  { label: 'Project Images', to: '/admin/projects', icon: FolderKanban },
+  { label: 'Overview', section: 'overview', number: '00' },
+  { label: 'Header & hero', section: 'hero', number: '01' },
+  { label: 'Featured work', section: 'work', number: '02' },
+  { label: 'About & experience', section: 'about', number: '03' },
+  { label: 'Footer & contact', section: 'footer', number: '04' },
 ];
 
 export default function AdminLayout() {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const activeSection = location.hash.slice(1) || 'overview';
 
   async function handleLogout() {
     await signOut();
     navigate('/admin/login');
   }
 
-  return (
-    <ToastProvider>
-      <div className="admin-root">
-        {/* Mobile backdrop */}
-        {sidebarOpen && (
-          <div className="admin-sidebar-backdrop" onClick={() => setSidebarOpen(false)} />
-        )}
-
-        {/* Sidebar */}
-        <aside className={`admin-sidebar ${sidebarOpen ? 'open' : ''}`}>
-          <div className="admin-sidebar-brand">
-            <div className="brand-dot">IA</div>
-            <span>IA CMS</span>
-          </div>
-
-          <nav className="admin-sidebar-nav">
-            {NAV_ITEMS.map((item, i) => {
-              if (item.type === 'label') {
-                return <div key={i} className="nav-label">{item.text}</div>;
-              }
-              return (
-                <NavLink
-                  key={item.to}
-                  to={item.to}
-                  end={item.end}
-                  className={({ isActive }) => `admin-nav-item ${isActive ? 'active' : ''}`}
-                  onClick={() => setSidebarOpen(false)}
-                >
-                  <item.icon className="nav-icon" />
-                  {item.label}
-                </NavLink>
-              );
-            })}
-          </nav>
-
-          <div className="admin-sidebar-footer">
-            <button className="admin-nav-item" onClick={handleLogout}>
-              <LogOut className="nav-icon" />
-              Logout
-            </button>
-          </div>
-        </aside>
-
-        {/* Main */}
-        <div className="admin-main">
-          <header className="admin-topbar">
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-              <button
-                className="admin-btn admin-btn-ghost admin-btn-icon admin-mobile-toggle"
-                onClick={() => setSidebarOpen(!sidebarOpen)}
-              >
-                {sidebarOpen ? <X size={18} /> : <Menu size={18} />}
-              </button>
-              <span className="admin-topbar-title">Dashboard</span>
-            </div>
-
-            <div className="admin-topbar-actions">
-              <span style={{ fontSize: 12, color: '#71717a' }}>{user?.email}</span>
-              <a
-                href="/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="admin-btn admin-btn-ghost admin-btn-sm"
-              >
-                <ExternalLink size={14} /> View Site
-              </a>
-            </div>
-          </header>
-
-          <main className="admin-content">
-            <Outlet />
-          </main>
-        </div>
-      </div>
-    </ToastProvider>
-  );
+  return <ToastProvider><div className="admin-root">
+    {sidebarOpen && <button type="button" className="admin-sidebar-backdrop" onClick={() => setSidebarOpen(false)} aria-label="Close section menu" />}
+    <aside className={`admin-sidebar ${sidebarOpen ? 'open' : ''}`} aria-label="Portfolio editor sections">
+      <Link className="admin-sidebar-brand" to="/admin" onClick={() => setSidebarOpen(false)}><span className="brand-dot">IA</span><span>INDRA ARYA<small>PORTFOLIO STUDIO</small></span></Link>
+      <div className="admin-sidebar-caption">EDIT THE LANDING PAGE</div>
+      <nav className="admin-sidebar-nav" aria-label="Editor navigation">
+        {NAV_ITEMS.map((item) => <Link key={item.section} to={item.section === 'overview' ? '/admin' : `/admin#${item.section}`} className={`admin-nav-item ${activeSection === item.section ? 'active' : ''}`} aria-current={activeSection === item.section ? 'page' : undefined} onClick={() => setSidebarOpen(false)}><span className="admin-nav-number">{item.number}</span><span>{item.label}</span><span className="admin-nav-arrow">↗</span></Link>)}
+      </nav>
+      <div className="admin-sidebar-footer"><span>Signed in as</span><strong>{user?.email}</strong><button type="button" className="admin-logout" onClick={handleLogout}><LogOut size={15} /> Sign out</button></div>
+    </aside>
+    <div className="admin-main">
+      <header className="admin-topbar"><div className="admin-topbar-start"><button type="button" className="admin-mobile-toggle" onClick={() => setSidebarOpen(!sidebarOpen)} aria-label={sidebarOpen ? 'Close section menu' : 'Open section menu'}>{sidebarOpen ? <X size={20} /> : <Menu size={20} />}</button><span className="admin-topbar-title">CONTENT STUDIO <span>/</span> {NAV_ITEMS.find((item) => item.section === activeSection)?.label || 'Overview'}</span></div><a className="admin-preview-link" href="/" target="_blank" rel="noopener noreferrer">View site <ArrowUpRight size={16} /></a></header>
+      <main className="admin-content"><Outlet /></main>
+    </div>
+  </div></ToastProvider>;
 }
