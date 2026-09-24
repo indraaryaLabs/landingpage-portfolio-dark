@@ -15,3 +15,7 @@ The admin shell uses a white canvas, black text, thin rules, large editorial hea
 ## Safety and proof
 
 Keep claims editable only by the owner, and do not introduce new factual assertions in defaults. Validate required fields, URL schemes, media types and upload sizes. Scope database and storage writes to the confirmed admin account; public reads remain available. Do not put a database password in frontend code. Verify the schema, RLS, admin save/reload, public rendering, image/video fallback, mobile/desktop presentation, build, targeted lint, and deployment preview. Do not merge the PR to main before review.
+
+## Production finishing update
+
+After owner review, add the owner-provided Instagram URL beside LinkedIn in the existing footer social row. Use the same short text-link style rather than a new icon or layout. Add Instagram URL and label fields to the Footer CMS section. The existing JSONB normalization merges new defaults into older saved content, so no database migration or content overwrite is required. Validate the URL like other social links, test both the public link and CMS field, then merge the reviewed branch and verify the production domain.

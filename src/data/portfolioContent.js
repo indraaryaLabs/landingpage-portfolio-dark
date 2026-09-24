@@ -72,6 +72,8 @@ export const defaultPortfolioContent = {
     githubLabel: 'GH',
     linkedinUrl: profile.linkedin,
     linkedinLabel: 'IN',
+    instagramUrl: 'https://www.instagram.com/indraarrya/',
+    instagramLabel: 'IG',
     copyrightName: 'Indra Arya',
   },
 };
