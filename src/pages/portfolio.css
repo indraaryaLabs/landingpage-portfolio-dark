@@ -15,6 +15,22 @@ button { font: inherit; cursor: pointer; }
 .recon-site { overflow-x: clip; background: #fff; }
 .recon-site :focus-visible { outline: 3px solid #1769ff; outline-offset: 4px; }
 
+.recon-loading { min-height: 100vh; }
+.recon-loading-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.recon-loading-block { display: block; background: #ebebeb; }
+.recon-loading-nav { height: 76px; padding: 0 32px; display: flex; align-items: center; justify-content: space-between; }
+.recon-loading-brand { width: 100px; height: 17px; border-radius: 4px; }
+.recon-loading-nav-links { width: 120px; height: 17px; border-radius: 4px; }
+.recon-loading-contact { width: 180px; height: 42px; border-radius: 100px; }
+.recon-loading-hero { width: min(960px, calc(100% - 48px)); min-height: 548px; margin: 0 auto; padding-top: 64px; display: grid; grid-template-columns: 350px minmax(0, 1fr); gap: 80px; }
+.recon-loading-portrait { width: 250px; height: 250px; margin-left: auto; border-radius: 50%; }
+.recon-loading-copy { padding-top: 2px; }
+.recon-loading-heading { width: 90%; height: 72px; margin-bottom: 12px; border-radius: 8px; }
+.recon-loading-heading-short { width: 62%; margin-bottom: 32px; }
+.recon-loading-line { width: 85%; height: 22px; margin-bottom: 14px; border-radius: 5px; }
+.recon-loading-line-short { width: 68%; }
+.recon-loading-reel { height: 500px; background: #e9e9e9; }
+
 .recon-nav {
   position: sticky;
   top: 0;
@@ -111,6 +127,8 @@ button { font: inherit; cursor: pointer; }
 .recon-footer-bottom div { display: flex; gap: 18px; }
 
 @media (min-width: 1300px) {
+  .recon-loading-hero { min-height: 622px; }
+  .recon-loading-reel { height: 850px; }
   .recon-hero { height: 622px; }
   .recon-reel { height: 850px; }
   .recon-work { min-height: 5060px; }
@@ -129,6 +147,15 @@ button { font: inherit; cursor: pointer; }
 }
 
 @media (max-width: 809px) {
+  .recon-loading-nav { padding: 0 16px; }
+  .recon-loading-nav-links { width: 90px; }
+  .recon-loading-contact { display: none; }
+  .recon-loading-hero { width: calc(100% - 32px); min-height: 750px; padding-top: 34px; display: flex; flex-direction: column; gap: 55px; }
+  .recon-loading-portrait { width: 249px; height: 249px; margin: 0 auto; }
+  .recon-loading-copy { width: min(440px, 100%); margin: 0 auto; }
+  .recon-loading-heading { height: 58px; margin-right: auto; margin-left: auto; }
+  .recon-loading-line { margin-right: auto; margin-left: auto; }
+  .recon-loading-reel { height: 345px; }
   .recon-nav { height: 76px; padding: 0 16px; grid-template-columns: 1fr auto; }
   .recon-wordmark { font-size: 14px; }
   .recon-nav nav { gap: 26px; font-size: 14px; }
