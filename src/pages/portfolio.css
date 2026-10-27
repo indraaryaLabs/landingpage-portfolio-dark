@@ -81,7 +81,7 @@ button { font: inherit; cursor: pointer; }
 .recon-portrait { width: 250px; height: 250px; margin-left: auto; border-radius: 50%; overflow: hidden; background: #ebebeb; }
 .recon-portrait img { width: 100%; height: 100%; display: block; object-fit: cover; }
 .recon-hero-copy h1 { margin: 0 0 31px; font-size: clamp(74px, 7.1vw, 96px); line-height: .9; font-weight: 440; letter-spacing: -.075em; white-space: pre-line; }
-.recon-hero-copy p { max-width: 440px; margin: 0 0 18px; font-size: 21px; line-height: 1.23; letter-spacing: -.025em; }
+.recon-hero-copy p { max-width: 440px; margin: 0 0 18px; font-size: 21px; line-height: 1.23; letter-spacing: -.025em; text-align: justify; hyphens: auto; }
 .recon-hero-copy p:nth-of-type(2) { font-size: 17px; line-height: 1.35; }
 .recon-hero-link { display: inline-block; margin-top: 10px; font-size: 13px; font-weight: 700; text-transform: uppercase; }
 .recon-hero-link span { margin-left: 8px; font-size: 18px; }
@@ -89,37 +89,41 @@ button { font: inherit; cursor: pointer; }
 .recon-reel { height: 500px; overflow: hidden; background: #050505; }
 .recon-reel video { width: 100%; height: 100%; display: block; object-fit: cover; }
 
-.recon-work { position: relative; min-height: 4580px; scroll-margin-top: 76px; }
-.recon-work-title { position: sticky; top: 0; z-index: 1; height: 100vh; padding: 0 32px 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
-.recon-work-title h2 { margin: 0; font-size: clamp(130px, 17vw, 220px); font-weight: 440; line-height: 1; letter-spacing: -.075em; white-space: nowrap; }
-.recon-work-title p { margin: 30px 0 0; color: #666; font-size: 13px; font-weight: 600; }
-.recon-work-card { position: absolute; z-index: 5; width: min(450px, calc(100% - 32px)); background: #fff; }
-.recon-work-card-1 { top: 1165px; left: 6.3%; }
-.recon-work-card-2 { top: 2385px; right: 2.5%; }
-.recon-work-card-3 { top: 3410px; left: 28.3%; }
-.recon-work-card a { display: block; }
-.recon-work-image { position: relative; width: 100%; aspect-ratio: 450 / 310; overflow: hidden; border-radius: 12px; background: #e5e5e5; }
-.recon-work-image img { width: 100%; height: 100%; display: block; object-fit: cover; transition: transform .45s ease; }
-.recon-work-card a:hover img { transform: scale(1.025); }
-.recon-work-overlay { position: absolute; inset: 0; padding: 22px; display: flex; flex-direction: column; justify-content: end; gap: 12px; background: rgba(14, 14, 14, .9); color: #fff; opacity: 0; transition: opacity .25s ease; }
-.recon-work-card a:hover .recon-work-overlay, .recon-work-card a:focus-visible .recon-work-overlay { opacity: 1; }
-.recon-work-overlay span, .recon-work-overlay small { font-size: 12px; line-height: 1.3; }
-.recon-work-overlay p { margin: 0; font-size: 17px; line-height: 1.3; }
-.recon-work-caption { height: 40px; padding: 8px 2px 0; }
-.recon-work-caption strong { display: block; font-size: 20px; line-height: 1.2; letter-spacing: -.04em; }
+.recon-nav { transition: background-color .3s ease, color .3s ease; }
+.recon-nav-dark { background: transparent; color: #fff; backdrop-filter: none; -webkit-backdrop-filter: none; }
+.recon-nav-dark .recon-email { background: #fff; color: #0a0a0a; }
+.recon-nav-dark .recon-email:hover { background: #e6e6e6; }
 
-.recon-about { min-height: 1545px; max-width: 1440px; margin: 0 auto; padding: 0 32px 110px; scroll-margin-top: 76px; }
+.recon-work { position: relative; height: 360vh; background: #0a0a0a; color: #fff; }
+.recon-work-stage { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; }
+.recon-work-viewport { position: absolute; inset: 0; perspective: 2650px; perspective-origin: 50% 50%; transform-style: preserve-3d; }
+.recon-work-scene { position: absolute; inset: 0; transform: rotateX(-45deg); transform-origin: 50% 50%; transform-style: preserve-3d; pointer-events: none; will-change: transform; }
+.recon-work-layer { position: absolute; top: 50%; left: 50%; width: 400px; height: 500px; display: block; overflow: hidden; border-radius: 8px; background: #0a0a0a; pointer-events: auto; cursor: pointer; transform: translate(-50%, -50%); will-change: transform, opacity, filter; -webkit-user-drag: none; user-select: none; }
+.recon-work-layer img { width: 100%; height: 100%; display: block; border-radius: 4px; object-fit: cover; }
+.recon-work-layer-fallback { width: 100%; height: 100%; padding: 28px; display: flex; flex-direction: column; justify-content: flex-end; gap: 8px; border-radius: 4px; background: #1c1c1c; }
+.recon-work-layer-fallback strong { font-size: 30px; line-height: 1; font-weight: 600; letter-spacing: -.04em; }
+.recon-work-layer-fallback small { color: rgba(255, 255, 255, .6); font-size: 14px; }
+.recon-work-heading { position: absolute; top: 50%; left: 32px; z-index: 2; width: min-content; margin: 0; font-size: clamp(40px, 4.4vw, 64px); font-weight: 600; line-height: .95; letter-spacing: -.045em; text-transform: uppercase; transform: translateY(-50%); pointer-events: none; }
+.recon-work-active { position: absolute; top: 50%; right: 32px; z-index: 2; width: 220px; transform: translateY(-50%); pointer-events: none; }
+.recon-work-active span { display: block; margin-bottom: 10px; color: rgba(255, 255, 255, .55); font-size: 12px; font-weight: 600; }
+.recon-work-active p { margin: 0; font-size: 18px; line-height: 1.2; font-weight: 500; letter-spacing: -.02em; }
+.recon-work-active .recon-work-active-category { color: rgba(255, 255, 255, .6); }
+.recon-work-cue { position: absolute; bottom: 28px; left: 50%; z-index: 2; margin: 0; padding: 11px 20px; border-radius: 100px; background: rgba(38, 38, 38, .7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); color: rgba(255, 255, 255, .85); font-size: 12px; font-weight: 600; white-space: nowrap; transform: translateX(-50%); pointer-events: none; }
+.recon-work-layer:focus-visible { outline: 3px solid #fff; outline-offset: 4px; }
+
+.recon-about { min-height: 1545px; max-width: 1440px; margin: 0 auto; padding: 140px 32px 110px; scroll-margin-top: 0; }
 .recon-about h2 { margin: 0 0 95px; font-size: clamp(86px, 8vw, 120px); line-height: 1; font-weight: 440; letter-spacing: -.08em; }
 .recon-about-intro { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; margin-bottom: 195px; }
 .recon-about-intro h3, .recon-about-intro p { max-width: 565px; margin: 0; font-size: 24px; line-height: 1.25; font-weight: 480; letter-spacing: -.028em; }
+.recon-about-intro p { text-align: justify; hyphens: auto; }
 .recon-about-intro p + p { margin-top: 23px; }
 .recon-timeline-row { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; min-height: 230px; padding: 0 0 48px; }
-.recon-timeline-row > p { margin: 0; font-size: 17px; line-height: 1.4; font-weight: 500; }
-.recon-timeline-row h3 { margin: 0 0 6px; font-size: 20px; font-weight: 650; letter-spacing: -.03em; }
-.recon-timeline-row strong { font-size: 17px; font-weight: 550; }
-.recon-timeline-row div > p { max-width: 600px; margin: 14px 0 0; color: #3c3c3c; font-size: 15px; line-height: 1.45; }
+/* One body size for period, role and description so the row reads evenly; only the title is larger. */
+.recon-timeline-row > p { margin: 0; font-size: 16px; line-height: 1.6; font-weight: 500; }
+.recon-timeline-row h3 { margin: 0 0 4px; font-size: 20px; line-height: 1.3; font-weight: 650; letter-spacing: -.03em; }
+.recon-timeline-row strong { display: block; font-size: 16px; line-height: 1.6; font-weight: 550; }
+.recon-timeline-row div > p { max-width: 600px; margin: 12px 0 0; color: #3c3c3c; font-size: 16px; line-height: 1.6; text-align: justify; hyphens: auto; }
 .recon-timeline-row a { display: inline-block; margin-top: 16px; font-size: 13px; font-weight: 700; }
-.recon-visual-note { max-width: 500px; margin: 0 0 0 auto; color: #555; font-size: 13px; line-height: 1.4; }
 
 .recon-footer { position: relative; min-height: 468px; max-width: 1440px; margin: 0 auto; padding: 85px 32px 28px; border-top: 1px solid #c9c8c8; text-align: center; }
 .recon-footer h2 { margin: 0 0 34px; font-size: clamp(72px, 8vw, 120px); font-weight: 440; line-height: .88; letter-spacing: -.075em; white-space: pre-line; }
@@ -131,10 +135,6 @@ button { font: inherit; cursor: pointer; }
   .recon-loading-reel { height: 850px; }
   .recon-hero { height: 622px; }
   .recon-reel { height: 850px; }
-  .recon-work { min-height: 5060px; }
-  .recon-work-card-1 { top: 1265px; }
-  .recon-work-card-2 { top: 2650px; }
-  .recon-work-card-3 { top: 3720px; }
   .recon-about { min-height: 1638px; }
   .recon-footer { min-height: 598px; padding-top: 145px; }
 }
@@ -142,11 +142,14 @@ button { font: inherit; cursor: pointer; }
 @media (min-width: 810px) and (max-width: 1050px) {
   .recon-hero-inner { grid-template-columns: 260px minmax(0, 1fr); gap: 50px; }
   .recon-hero-copy h1 { font-size: 74px; }
-  .recon-work-title h2 { font-size: 10vw; }
-  .recon-work-card-3 { left: calc(50% - 225px); }
 }
 
 @media (max-width: 809px) {
+  .recon-work { height: 300vh; }
+  .recon-work-layer { width: 260px; height: 260px; }
+  .recon-work-heading { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  .recon-work-active { top: auto; right: 16px; bottom: 84px; left: 16px; width: auto; text-align: center; text-shadow: 0 1px 12px rgba(0, 0, 0, .8); transform: none; }
+  .recon-work-active p { font-size: 16px; }
   .recon-loading-nav { padding: 0 16px; }
   .recon-loading-nav-links { width: 90px; }
   .recon-loading-contact { display: none; }
@@ -165,27 +168,18 @@ button { font: inherit; cursor: pointer; }
   .recon-portrait { width: 249px; height: 249px; margin: 0 auto; }
   .recon-hero-copy { width: 100%; text-align: center; }
   .recon-hero-copy h1 { margin-bottom: 34px; font-size: clamp(58px, 12vw, 86px); }
-  .recon-hero-copy p { max-width: 440px; margin: 0 auto 16px; font-size: 19px; }
+  .recon-hero-copy p { max-width: 440px; margin: 0 auto 16px; font-size: 19px; text-align-last: center; }
   .recon-hero-copy p:nth-of-type(2) { font-size: 15px; }
   .recon-hero-link { margin-top: 14px; }
   .recon-reel { height: 345px; }
-  .recon-work { min-height: 3804px; }
-  .recon-work-title { padding: 0 16px; }
-  .recon-work-title h2 { max-width: none; margin: 0 auto; font-size: clamp(50px, 14.5vw, 62px); line-height: 1; letter-spacing: -.01em; white-space: nowrap; }
-  .recon-work-title p { margin-top: 23px; }
-  .recon-work-card { right: auto; left: 50%; transform: translateX(-50%); }
-  .recon-work-image { aspect-ratio: auto; height: 320px; }
-  .recon-work-card-1 { top: 1084px; }
-  .recon-work-card-2 { top: 1904px; }
-  .recon-work-card-3 { top: 2684px; }
-  .recon-about { min-height: 1795px; padding: 0 16px 100px; }
+  .recon-about { min-height: 1795px; padding: 96px 16px 100px; }
   .recon-about h2 { margin-bottom: 65px; font-size: 76px; }
   .recon-about-intro { display: block; margin-bottom: 110px; }
   .recon-about-intro h3, .recon-about-intro p { font-size: 22px; }
   .recon-about-intro h3 { margin-bottom: 28px; }
   .recon-timeline-row { display: block; min-height: 0; margin-bottom: 70px; padding: 0; }
   .recon-timeline-row > p { margin-bottom: 18px; }
-  .recon-timeline-row h3 { font-size: 21px; }
+  .recon-timeline-row h3 { font-size: 20px; }
   .recon-footer { min-height: 503px; padding: 95px 16px 25px; }
   .recon-footer h2 { font-size: clamp(58px, 12vw, 90px); }
   .recon-footer-bottom { right: 16px; bottom: 25px; left: 16px; }
@@ -193,12 +187,10 @@ button { font: inherit; cursor: pointer; }
 
 @media (max-width: 430px) {
   .recon-hero-copy h1 { font-size: 60px; }
-  .recon-work-title h2 { font-size: clamp(50px, 14.5vw, 62px); }
-  .recon-work-caption strong { font-size: 20px; }
   .recon-about-intro h3, .recon-about-intro p { font-size: 20px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .recon-email, .recon-work-image img, .recon-work-overlay { transition: none; }
+  .recon-email, .recon-nav { transition: none; }
 }

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { ArrowDown, ArrowUp, ArrowUpRight, Check, Image as ImageIcon, Save, Video } from 'lucide-react';
-import { defaultPortfolioContent, normalizePortfolioContent, safeWebUrl, templateMedia } from '../../data/portfolioContent';
+import { createProjectCard, defaultPortfolioContent, isTemplateProjectImage, normalizePortfolioContent, projectTemplateImage, safeWebUrl, templateMedia } from '../../data/portfolioContent';
 import { getProjects, getSiteSettings, upsertSiteSettings, uploadMedia } from '../../lib/supabaseApi';
 import ImageUpload from './components/ImageUpload';
 import { useToast } from './components/Toast';
@@ -9,7 +9,7 @@ import { useToast } from './components/Toast';
 const SECTIONS = {
   overview: { number: '00', title: 'Portfolio overview', eyebrow: 'YOUR SITE AT A GLANCE' },
   hero: { number: '01', title: 'Header & hero', eyebrow: 'FIRST IMPRESSION' },
-  work: { number: '02', title: 'Featured work', eyebrow: 'THREE PROJECT SLOTS' },
+  work: { number: '02', title: 'Featured work', eyebrow: '3D PROJECT GALLERY' },
   about: { number: '03', title: 'About & experience', eyebrow: 'YOUR STORY' },
   footer: { number: '04', title: 'Footer & contact', eyebrow: 'STAY IN TOUCH' },
 };
@@ -29,8 +29,8 @@ function ImageSlot({ label, description, value, defaultUrl, onChange, aspect, on
   return <div className="admin-media-slot">
     <div className="admin-media-intro"><div className="admin-media-icon"><ImageIcon size={20} strokeWidth={1.6} /></div><div><h3>{label}</h3><p>{description}</p></div></div>
     <ImageUpload label="Image file" value={value || defaultUrl} onChange={(next) => onChange(next || defaultUrl)} canRemove={!isTemplate} aspect={aspect} optimized onUploadingChange={onUploadingChange} />
-    <p className="admin-hint">{isTemplate ? 'Currently using the original template artwork. Upload your own image, then Save to publish.' : 'Custom image selected. Save to publish any changes.'}</p>
-    <Field label={altLabel} value={altValue} onChange={onAltChange} hint="A neutral description is added on upload. Edit it to describe the actual image more precisely." required={!isTemplate} />
+    <p className="admin-hint">{isTemplate ? 'Currently using the original template artwork. Upload your own image, then Save to publish.' : value ? 'Custom image selected. Save to publish any changes.' : 'No image yet. The card shows the project name until you upload one.'}</p>
+    <Field label={altLabel} value={altValue} onChange={onAltChange} hint="A neutral description is added on upload. Edit it to describe the actual image more precisely." required={!isTemplate && Boolean(value)} />
   </div>;
 }
 
@@ -82,9 +82,10 @@ function validateContent(content) {
   const links = [content.hero.linkUrl, content.footer.githubUrl, content.footer.linkedinUrl, content.footer.instagramUrl, content.hero.portraitUrl, content.hero.reelUrl,
     ...content.work.cards.flatMap((card) => [card.link, card.imageUrl]), ...content.about.timeline.map((entry) => entry.linkUrl)];
   if (links.some((url) => url && !safeWebUrl(url))) throw new Error('Links and media URLs must start with https:// or http://.');
+  if (!content.work.cards.length) throw new Error('Add at least one project to the gallery.');
   if (content.work.cards.some((card) => !card.name?.trim() || !card.link?.trim())) throw new Error('Every project needs a name and destination URL.');
   if (content.hero.portraitUrl !== templateMedia.portrait && content.hero.portraitUrl && !content.hero.portraitAlt?.trim()) throw new Error('Describe your new portrait in the alternative-text field.');
-  if (content.work.cards.some((card, index) => card.imageUrl && card.imageUrl !== templateMedia.projects[index] && !card.imageAlt?.trim())) throw new Error('Add alternative text for each new project image.');
+  if (content.work.cards.some((card) => card.imageUrl && !isTemplateProjectImage(card.imageUrl) && !card.imageAlt?.trim())) throw new Error('Add alternative text for each new project image.');
 }
 
 export default function PortfolioEditor() {
@@ -134,8 +135,30 @@ export default function PortfolioEditor() {
     setDirty(true);
   }
 
-  function updateCardImage(slot, index, value) {
-    setContent((current) => ({ ...current, work: { ...current.work, cards: current.work.cards.map((card) => card.slot === slot ? { ...card, imageUrl: value, imageAlt: value === templateMedia.projects[index] || !value ? defaultPortfolioContent.work.cards[index].imageAlt : `Visual for ${card.name}` } : card) } }));
+  function updateCardImage(slot, value) {
+    setContent((current) => ({ ...current, work: { ...current.work, cards: current.work.cards.map((card) => card.slot === slot ? { ...card, imageUrl: value, imageAlt: isTemplateProjectImage(value) ? defaultPortfolioContent.work.cards[0].imageAlt : value ? `Visual for ${card.name}` : '' } : card) } }));
+    setDirty(true);
+  }
+
+  function addCard() {
+    setContent((current) => ({ ...current, work: { ...current.work, cards: [...current.work.cards, createProjectCard(Math.max(0, ...current.work.cards.map((card) => card.slot)) + 1)] } }));
+    setDirty(true);
+  }
+
+  function removeCard(slot) {
+    setContent((current) => ({ ...current, work: { ...current.work, cards: current.work.cards.filter((card) => card.slot !== slot) } }));
+    setDirty(true);
+  }
+
+  function moveCard(slot, direction) {
+    setContent((current) => {
+      const cards = [...current.work.cards];
+      const index = cards.findIndex((card) => card.slot === slot);
+      const destination = index + direction;
+      if (index < 0 || destination < 0 || destination >= cards.length) return current;
+      [cards[index], cards[destination]] = [cards[destination], cards[index]];
+      return { ...current, work: { ...current.work, cards } };
+    });
     setDirty(true);
   }
 
@@ -202,7 +225,7 @@ export default function PortfolioEditor() {
 
     {section === 'overview' && <div className="admin-overview">
       <div className="admin-overview-lead"><p className="admin-eyebrow">YOUR EDITOR, YOUR STORY</p><h2>One site.<br />Every detail in your hands.</h2><p>Update the words, links, portrait, showreel, and project visuals without changing the approved landing-page composition. Template artwork stays in place until you replace it and save.</p><a className="admin-btn admin-btn-primary" href="/" target="_blank" rel="noopener noreferrer">View live preview <ArrowUpRight size={16} /></a></div>
-      <div className="admin-overview-grid">{Object.entries(SECTIONS).filter(([key]) => key !== 'overview').map(([key, meta]) => <Link className="admin-overview-tile" to={`/admin#${key}`} key={key}><span>{meta.number} / {meta.eyebrow}</span><h3>{meta.title}</h3><p>{key === 'hero' ? 'Portrait, showreel, headline and introduction' : key === 'work' ? 'Three project images, descriptions and links' : key === 'about' ? 'Introduction, career timeline and education' : 'Contact email, social links and closing line'}</p><ArrowUpRight size={18} /></Link>)}</div>
+      <div className="admin-overview-grid">{Object.entries(SECTIONS).filter(([key]) => key !== 'overview').map(([key, meta]) => <Link className="admin-overview-tile" to={`/admin#${key}`} key={key}><span>{meta.number} / {meta.eyebrow}</span><h3>{meta.title}</h3><p>{key === 'hero' ? 'Portrait, showreel, headline and introduction' : key === 'work' ? 'Project gallery: images, descriptions and links' : key === 'about' ? 'Introduction, career timeline and education' : 'Contact email, social links and closing line'}</p><ArrowUpRight size={18} /></Link>)}</div>
       <p className="admin-proof-note"><Check size={15} /> Keep every professional claim accurate to your experience before publishing.</p>
     </div>}
 
@@ -214,13 +237,13 @@ export default function PortfolioEditor() {
 
     {section === 'work' && <div className="admin-section-stack">
       <div className="admin-panel"><p className="admin-panel-index">FEATURED WORK</p><h2>Section title</h2><div className="admin-editor-grid"><Field label="Heading" value={content.work.heading} onChange={(value) => updatePart('work', 'heading', value)} required /><Field label="Scroll cue" value={content.work.scrollLabel} onChange={(value) => updatePart('work', 'scrollLabel', value)} /></div></div>
-      {content.work.cards.map((card, index) => <div className="admin-panel" key={card.slot}><p className="admin-panel-index">PROJECT 0{index + 1}</p><h2>{card.name || `Project ${index + 1}`}</h2><div className="admin-project-layout"><ImageSlot label={`Project ${index + 1} image`} description="Actual project screenshot recommended. Cropped to the card's landscape frame." value={card.imageUrl} defaultUrl={templateMedia.projects[index]} onChange={(value) => updateCardImage(card.slot, index, value)} aspect="450/310" onUploadingChange={onUploadingChange} isTemplate={!card.imageUrl || card.imageUrl === templateMedia.projects[index]} altLabel={`Project ${index + 1} image alt text`} altValue={card.imageAlt} onAltChange={(value) => updateCard(card.slot, 'imageAlt', value)} /><div className="admin-project-fields"><Field label={`Project ${index + 1} name`} value={card.name} onChange={(value) => updateCard(card.slot, 'name', value)} required /><Field label={`Project ${index + 1} category`} value={card.category} onChange={(value) => updateCard(card.slot, 'category', value)} /><Field label={`Project ${index + 1} summary`} value={card.summary} onChange={(value) => updateCard(card.slot, 'summary', value)} multiline rows={4} /><Field label={`Project ${index + 1} URL`} value={card.link} onChange={(value) => updateCard(card.slot, 'link', value)} type="url" required /></div></div></div>)}
+      {content.work.cards.map((card, index) => { const templateUrl = projectTemplateImage(card.slot); const label = `Project ${index + 1}`; return <div className="admin-panel" key={card.slot}><p className="admin-panel-index">PROJECT {String(index + 1).padStart(2, '0')}</p><div className="admin-panel-heading"><h2>{card.name || label}</h2><div className="admin-timeline-actions"><button type="button" onClick={() => moveCard(card.slot, -1)} disabled={index === 0} aria-label={`Move ${label} up`}><ArrowUp size={15} /></button><button type="button" onClick={() => moveCard(card.slot, 1)} disabled={index === content.work.cards.length - 1} aria-label={`Move ${label} down`}><ArrowDown size={15} /></button><button type="button" className="admin-link-danger" onClick={() => removeCard(card.slot)} disabled={content.work.cards.length === 1}>Remove</button></div></div><div className="admin-project-layout"><ImageSlot label={`${label} image`} description="Actual project screenshot recommended. Cropped to the gallery's 4:5 portrait card." value={card.imageUrl} defaultUrl={templateUrl} onChange={(value) => updateCardImage(card.slot, value)} aspect="4/5" onUploadingChange={onUploadingChange} isTemplate={Boolean(templateUrl) && (!card.imageUrl || card.imageUrl === templateUrl)} altLabel={`${label} image alt text`} altValue={card.imageAlt} onAltChange={(value) => updateCard(card.slot, 'imageAlt', value)} /><div className="admin-project-fields"><Field label={`${label} name`} value={card.name} onChange={(value) => updateCard(card.slot, 'name', value)} required /><Field label={`${label} category`} value={card.category} onChange={(value) => updateCard(card.slot, 'category', value)} /><Field label={`${label} summary`} value={card.summary} onChange={(value) => updateCard(card.slot, 'summary', value)} multiline rows={4} /><Field label={`${label} URL`} value={card.link} onChange={(value) => updateCard(card.slot, 'link', value)} type="url" required /></div></div></div>; })}
+      <button type="button" className="admin-btn admin-btn-ghost" onClick={addCard}>Add project +</button>
     </div>}
 
     {section === 'about' && <div className="admin-section-stack">
       <div className="admin-panel"><p className="admin-panel-index">ABOUT</p><h2>Introduction</h2><div className="admin-editor-grid"><Field label="About heading" value={content.about.heading} onChange={(value) => updatePart('about', 'heading', value)} required /><Field label="About headline" value={content.about.headline} onChange={(value) => updatePart('about', 'headline', value)} multiline rows={3} /><Field label="About paragraph 1" value={content.about.paragraphs[0] || ''} onChange={(value) => updateParagraph(0, value)} multiline rows={5} /><Field label="About paragraph 2" value={content.about.paragraphs[1] || ''} onChange={(value) => updateParagraph(1, value)} multiline rows={5} /></div></div>
       <div className="admin-panel"><p className="admin-panel-index">TIMELINE</p><div className="admin-panel-heading"><h2>Experience & education</h2><button type="button" className="admin-btn admin-btn-ghost" onClick={addTimeline}>Add entry +</button></div><div className="admin-timeline-editor">{content.about.timeline.map((entry, index) => <div className="admin-timeline-card" key={entry.id}><div className="admin-panel-heading"><strong>Entry {String(index + 1).padStart(2, '0')}</strong><div className="admin-timeline-actions"><button type="button" onClick={() => moveTimeline(entry.id, -1)} disabled={index === 0} aria-label={`Move entry ${index + 1} up`}><ArrowUp size={15} /></button><button type="button" onClick={() => moveTimeline(entry.id, 1)} disabled={index === content.about.timeline.length - 1} aria-label={`Move entry ${index + 1} down`}><ArrowDown size={15} /></button><button type="button" className="admin-link-danger" onClick={() => removeTimeline(entry.id)}>Remove</button></div></div><div className="admin-editor-grid"><Field label={`Entry ${index + 1} period`} value={entry.period} onChange={(value) => updateTimeline(entry.id, 'period', value)} /><Field label={`Entry ${index + 1} organization`} value={entry.title} onChange={(value) => updateTimeline(entry.id, 'title', value)} /><Field label={`Entry ${index + 1} role or qualification`} value={entry.subtitle} onChange={(value) => updateTimeline(entry.id, 'subtitle', value)} /><Field label={`Entry ${index + 1} description`} value={entry.description} onChange={(value) => updateTimeline(entry.id, 'description', value)} multiline rows={3} /><Field label={`Entry ${index + 1} link label`} value={entry.linkLabel} onChange={(value) => updateTimeline(entry.id, 'linkLabel', value)} /><Field label={`Entry ${index + 1} URL`} value={entry.linkUrl} onChange={(value) => updateTimeline(entry.id, 'linkUrl', value)} type="url" /></div></div>)}</div></div>
-      <div className="admin-panel"><Field label="Template image disclosure" value={content.about.imageNote} onChange={(value) => updatePart('about', 'imageNote', value)} multiline rows={2} hint="Shown only while at least one project still uses template artwork." /></div>
     </div>}
 
     {section === 'footer' && <div className="admin-section-stack"><div className="admin-panel"><p className="admin-panel-index">FOOTER</p><h2>Closing & contact</h2><div className="admin-editor-grid"><Field label="Closing heading" value={content.footer.heading} onChange={(value) => updatePart('footer', 'heading', value)} multiline rows={2} hint="A line break becomes a line break on the landing page." required /><Field label="Contact email" value={content.footer.email} onChange={(value) => updatePart('footer', 'email', value)} type="email" required /><Field label="GitHub URL" value={content.footer.githubUrl} onChange={(value) => updatePart('footer', 'githubUrl', value)} type="url" /><Field label="GitHub label" value={content.footer.githubLabel} onChange={(value) => updatePart('footer', 'githubLabel', value)} /><Field label="LinkedIn URL" value={content.footer.linkedinUrl} onChange={(value) => updatePart('footer', 'linkedinUrl', value)} type="url" /><Field label="LinkedIn label" value={content.footer.linkedinLabel} onChange={(value) => updatePart('footer', 'linkedinLabel', value)} /><Field label="Instagram URL" value={content.footer.instagramUrl} onChange={(value) => updatePart('footer', 'instagramUrl', value)} type="url" /><Field label="Instagram label" value={content.footer.instagramLabel} onChange={(value) => updatePart('footer', 'instagramLabel', value)} /><Field label="Copyright name" value={content.footer.copyrightName} onChange={(value) => updatePart('footer', 'copyrightName', value)} /></div></div></div>}

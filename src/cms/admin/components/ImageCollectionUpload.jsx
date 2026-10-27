@@ -569,6 +569,7 @@ export function ImageCropperModal({ src, filename, filetype, defaultAspect = '22
   // Predefined Aspect Ratio options
   const AR_PRESETS = [
     { id: '22/15', label: 'Marquee Card (22:15)' },
+    { id: '4/5', label: 'Gallery card (4:5)' },
     { id: '450/310', label: 'Project image (45:31)' },
     { id: '1/1', label: '1:1 Square' },
     { id: '4/3', label: '4:3 Classic' },
